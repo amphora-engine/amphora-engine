@@ -10,7 +10,9 @@ if (APPLE)
     set(CMAKE_THREAD_LIBS_INIT "-lpthread")
 endif()
 
-# Set project name here
+set(AMPHORA_ENGINE_VERSION_STRING "v0.2.0-beta")
+set(AMPHORA_ENGINE_SUFFIX "vanilla")
+
 project(amphora LANGUAGES C)
 
 set(CMAKE_C_STANDARD 17)
@@ -38,3 +40,4 @@ include_directories(
 )
 
 add_subdirectory(src)
+set_target_properties(amphora PROPERTIES OUTPUT_NAME "${CMAKE_PROJECT_NAME}-${AMPHORA_ENGINE_SUFFIX}-${AMPHORA_ENGINE_VERSION_STRING}")
