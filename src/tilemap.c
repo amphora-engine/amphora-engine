@@ -356,19 +356,17 @@ Amphora_GetMapLayerByName(const char *name) {
 
 static void
 Amphora_ProcessDeferredTransition(void) {
-	if (fade_layer == NULL)
-	{
-		(void)Amphora_UnregisterEvent("amph_internal_map_layer_fade");
+	if (fade_layer == NULL) goto cleanup;
 
-		return;
-	}
 	(void)SDL_SetTextureAlphaMod(fade_layer->texture, transition_fader.steps[transition_fader.idx++]);
 	if (transition_fader.idx != transition_fader.frames) return;
 
 	fade_layer->node->display = tilemap_flags.persist_shown;
-	tilemap_flags.transitioning = false;
-	Amphora_HeapFree(transition_fader.steps);
-	(void)Amphora_UnregisterEvent("amph_internal_map_layer_fade");
+
+	cleanup:
+		tilemap_flags.transitioning = false;
+		Amphora_HeapFree(transition_fader.steps);
+		(void)Amphora_UnregisterEvent("amph_internal_map_layer_fade");
 }
 
 /*
