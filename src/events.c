@@ -10,10 +10,12 @@ static int ev_count, ev_max = EVENT_BLOCK_SIZE;
 static HT_HashTable ev_table;
 
 int
-Amphora_RegisterEvent(const char *name, void (*func)(void)) {
+Amphora_RegisterEvent(const char *name, void (*func)(void))
+{
 	int i;
 
-	if (HT_GetValue(name, ev_table) != -1) {
+	if (HT_GetValue(name, ev_table) != -1)
+	{
 		Amphora_SetError(AMPHORA_STATUS_FAIL_UNDEFINED, "Event %s is already used", name);
 		return AMPHORA_STATUS_FAIL_UNDEFINED;
 	}
@@ -21,15 +23,19 @@ Amphora_RegisterEvent(const char *name, void (*func)(void)) {
 #ifdef DEBUG
 	SDL_Log("Registering event: %s\n", name);
 #endif
-	if (++ev_count >= ev_max) {
+	if (++ev_count >= ev_max)
+	{
 		ev_names = Amphora_HeapRealloc(ev_names, ev_max * sizeof(char *) + EVENT_BLOCK_SIZE * sizeof(char *), MEM_STRING);
 		(void)SDL_memset(ev_names + ev_max, 0, EVENT_BLOCK_SIZE * sizeof(char *));
 		ev_max += EVENT_BLOCK_SIZE;
 	}
-	for (i = 0; i < ev_max; i++) {
-		if (!ev_names[i]) {
+	for (i = 0; i < ev_max; i++)
+	{
+		if (!ev_names[i])
+		{
 			ev_names[i] = Amphora_HeapStrdup(name);
 			HT_StoreRef(name, func, ev_table);
+			HT_SetStatus(name, i, ev_table);
 			break;
 		}
 	}
@@ -38,14 +44,14 @@ Amphora_RegisterEvent(const char *name, void (*func)(void)) {
 }
 
 int
-Amphora_UnregisterEvent(const char *name) {
-	int i = 0;
+Amphora_UnregisterEvent(const char *name)
+{
+	int i = HT_GetStatus(name, ev_table);
 
-	while (ev_names[i] && SDL_strcmp(name, ev_names[i]) != 0) {
-		if (++i >= ev_max) {
-			Amphora_SetError(AMPHORA_STATUS_FAIL_UNDEFINED, "Event %s is not registered", name);
-			return AMPHORA_STATUS_FAIL_UNDEFINED;
-		}
+	if (i == -1)
+	{
+		Amphora_SetError(AMPHORA_STATUS_FAIL_UNDEFINED, "Event %s is not registered", name);
+		return AMPHORA_STATUS_FAIL_UNDEFINED;
 	}
 
 #ifdef DEBUG
@@ -65,8 +71,10 @@ Amphora_UnregisterEvent(const char *name) {
  */
 
 void
-Amphora_InitEvents(void) {
-	if (!((ev_names = Amphora_HeapCalloc(EVENT_BLOCK_SIZE, sizeof(char *), MEM_STRING)))) {
+Amphora_InitEvents(void)
+{
+	if (!((ev_names = Amphora_HeapCalloc(EVENT_BLOCK_SIZE, sizeof(char *), MEM_STRING))))
+	{
 		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Failed to allocate event name table");
 		return;
 	}
@@ -74,10 +82,12 @@ Amphora_InitEvents(void) {
 }
 
 void
-Amphora_DeInitEvents(void) {
+Amphora_DeInitEvents(void)
+{
 	int i;
 
-	for (i = 0; i < ev_count; i++) {
+	for (i = 0; i < ev_count; i++)
+	{
 		if (ev_names[i]) Amphora_HeapFree(ev_names[i]);
 	}
 	Amphora_HeapFree(ev_names);
@@ -85,9 +95,12 @@ Amphora_DeInitEvents(void) {
 }
 
 Uint32
-Amphora_ProcessEventLoop(SDL_Event *e) {
-	while (SDL_PollEvent(e)) {
-		switch (e->type) {
+Amphora_ProcessEventLoop(SDL_Event *e)
+{
+	while (SDL_PollEvent(e))
+	{
+		switch (e->type)
+		{
 			case SDL_QUIT:
 				return e->type;
 			case SDL_KEYDOWN:
@@ -113,6 +126,8 @@ Amphora_ProcessEventLoop(SDL_Event *e) {
 
 				Amphora_SetRenderLogicalSize(Amphora_GetResolution());
 				break;
+			default:
+				break;
 		}
 	}
 
@@ -120,10 +135,12 @@ Amphora_ProcessEventLoop(SDL_Event *e) {
 }
 
 void
-Amphora_ProcessRegisteredEvents(void) {
+Amphora_ProcessRegisteredEvents(void)
+{
 	int i;
 
-	for (i = 0; i < ev_max; i++) {
+	for (i = 0; i < ev_max; i++)
+	{
 		if (!ev_names[i]) continue;
 
 		((void(*)(void))HT_GetValue(ev_names[i], ev_table))();

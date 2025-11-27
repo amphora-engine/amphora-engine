@@ -145,6 +145,10 @@ Amphora_DestroyCurrentMap(void) {
 	int i;
 
 	for (i = 0; i < current_map.num_layers; i++) {
+		if (fade_layer == &current_map.layers[i])
+		{
+			fade_layer = NULL;
+		}
 		Amphora_HeapFree(current_map.layer_names[i]);
 		SDL_DestroyTexture(current_map.layers[i].texture);
 		current_map.layers[i].node->garbage = true;
@@ -352,6 +356,12 @@ Amphora_GetMapLayerByName(const char *name) {
 
 static void
 Amphora_ProcessDeferredTransition(void) {
+	if (fade_layer == NULL)
+	{
+		(void)Amphora_UnregisterEvent("amph_internal_map_layer_fade");
+
+		return;
+	}
 	(void)SDL_SetTextureAlphaMod(fade_layer->texture, transition_fader.steps[transition_fader.idx++]);
 	if (transition_fader.idx != transition_fader.frames) return;
 
