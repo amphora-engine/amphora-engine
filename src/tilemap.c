@@ -15,7 +15,7 @@ static int Amphora_ParseMapToTexture(const char *name);
 static int Amphora_ParseTileLayer(const cute_tiled_map_t *map, const cute_tiled_layer_t *layer, int tileset_img_w, SDL_Texture *tileset_img, int n);
 static int Amphora_ParseObjectGroup(const cute_tiled_layer_t *layer);
 static int Amphora_GetMapLayerByName(const char *name);
-static void Amphora_ProcessDeferredTransition(void);
+static void Amphora_MapLayerFadeEvent(void);
 
 /* File-scoped variables */
 static const char **map_names;
@@ -81,7 +81,7 @@ Amphora_HideMapLayer(const char *name, int t) {
 	}
 	tilemap_flags.transitioning = true;
 	tilemap_flags.persist_shown = false;
-	(void)Amphora_RegisterEvent("amph_internal_map_layer_fade", Amphora_ProcessDeferredTransition);
+	(void)Amphora_RegisterEvent("amph_internal_map_layer_fade", Amphora_MapLayerFadeEvent);
 
 	return AMPHORA_STATUS_OK;
 }
@@ -110,7 +110,7 @@ Amphora_ShowMapLayer(const char *name, int t) {
 	}
 	tilemap_flags.transitioning = true;
 	tilemap_flags.persist_shown = true;
-	(void)Amphora_RegisterEvent("amph_internal_map_layer_fade", Amphora_ProcessDeferredTransition);
+	(void)Amphora_RegisterEvent("amph_internal_map_layer_fade", Amphora_MapLayerFadeEvent);
 
 	return AMPHORA_STATUS_OK;
 }
@@ -355,7 +355,7 @@ Amphora_GetMapLayerByName(const char *name) {
 }
 
 static void
-Amphora_ProcessDeferredTransition(void) {
+Amphora_MapLayerFadeEvent(void) {
 	if (fade_layer == NULL) goto cleanup;
 
 	(void)SDL_SetTextureAlphaMod(fade_layer->texture, transition_fader.steps[transition_fader.idx++]);
