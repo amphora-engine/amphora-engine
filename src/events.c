@@ -4,6 +4,7 @@
 #include "internal/input.h"
 #include "internal/memory.h"
 #include "internal/render.h"
+#include "internal/scenes.h"
 
 static char **ev_names;
 static int ev_count, ev_max = EVENT_BLOCK_SIZE;
@@ -13,6 +14,8 @@ int
 Amphora_RegisterEvent(const char *name, void (*func)(void))
 {
 	int i;
+
+	if (Amphora_IsSceneUpdateLocked()) return AMPHORA_STATUS_OK;
 
 	if (HT_GetValue(name, ev_table) != -1)
 	{

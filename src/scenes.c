@@ -42,11 +42,13 @@ Amphora_LoadScene(const char *name) {
 		Amphora_SetError(AMPHORA_STATUS_FAIL_UNDEFINED, "Scene transition event registration failed");
 		return AMPHORA_STATUS_FAIL_UNDEFINED;
 	}
+	Amphora_LockSceneUpdate();
 	fade_rect.w = screen_size.x;
 	fade_rect.h = screen_size.y;
 	transition_fader.frames = transition_fader.timer * Amphora_GetFPS() / 1000;
 	if (!((transition_fader.steps = Amphora_HeapAlloc((transition_fader.frames >> 1) * sizeof(Uint8), MEM_MISC)))) {
 		Amphora_SetError(AMPHORA_STATUS_ALLOC_FAIL, "Failed to allocate memory for fade steps\n");
+		Amphora_UnlockSceneUpdate();
 		return AMPHORA_STATUS_ALLOC_FAIL;
 	}
 	for (i = 0; i < transition_fader.frames >> 1; i++) {
@@ -88,6 +90,7 @@ Amphora_DeInitSceneManager(void) {
 void
 Amphora_InitScene(void) {
 	scene_structs[current_scene_idx].init_func();
+	Amphora_UnlockSceneUpdate();
 }
 
 void
@@ -111,6 +114,22 @@ Amphora_DestroyScene(void) {
 #ifndef DISABLE_FONTS
 	Amphora_FreeAllFonts();
 #endif
+bool
+Amphora_IsSceneUpdateLocked(void)
+{
+	return scene_update_lock;
+}
+
+void
+Amphora_LockSceneUpdate(void)
+{
+	scene_update_lock = true;
+}
+
+void
+Amphora_UnlockSceneUpdate(void)
+{
+	scene_update_lock = false;
 }
 
 /*

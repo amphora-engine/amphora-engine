@@ -16,5 +16,8 @@ void Amphora_DeInitSceneManager(void);
 void Amphora_InitScene(void);
 void Amphora_UpdateScene(Uint32 frame_count);
 void Amphora_DestroyScene(void);
+bool Amphora_IsSceneUpdateLocked(void);
+void Amphora_LockSceneUpdate(void);
+void Amphora_UnlockSceneUpdate(void);
 
 #endif /* AMPHORA_SCENES_INTERNAL_H */

@@ -133,10 +133,13 @@ Amphora_MainLoop(SDL_Event *e) {
 		return 1;
 	}
 	Amphora_ClearBG();
-	if (Amphora_ControllerConnected()) Amphora_HandleJoystick();
-	Amphora_UpdateScene(frame_count);
+	if (Amphora_IsSceneUpdateLocked() == false)
+	{
+		if (Amphora_ControllerConnected()) Amphora_HandleJoystick();
+		Amphora_UpdateScene(frame_count);
+		Amphora_UpdateCamera();
+	}
 	Amphora_ProcessRenderList();
-	Amphora_UpdateCamera();
 	Amphora_ProcessRegisteredEvents();
 	Amphora_HeapClearFrameHeap();
 
