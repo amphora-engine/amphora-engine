@@ -28,7 +28,8 @@ static int framerate;
  */
 
 int
-Amphora_InitConfig(void) {
+Amphora_InitConfig(void)
+{
 	sqlite3 *db = Amphora_GetDB();
 	const char *sql = "CREATE TABLE IF NOT EXISTS prefs("
 			  "uuid TEXT PRIMARY KEY NOT NULL,"
@@ -41,7 +42,8 @@ Amphora_InitConfig(void) {
 	char *err_msg;
 
 	sqlite3_exec(db, sql, NULL, NULL, &err_msg);
-	if (err_msg) {
+	if (err_msg)
+	{
 		SDL_Log("%s\n", err_msg);
 		return -1;
 	}
@@ -55,7 +57,8 @@ Amphora_InitConfig(void) {
 }
 
 int
-Amphora_SaveWinX(int win_x) {
+Amphora_SaveWinX(int win_x)
+{
 	sqlite3 *db = Amphora_GetDB();
 	sqlite3_stmt *stmt;
 	const char *sql = "UPDATE prefs SET win_x=? WHERE uuid=?;";
@@ -70,7 +73,8 @@ Amphora_SaveWinX(int win_x) {
 }
 
 int
-Amphora_SaveWinY(int win_y) {
+Amphora_SaveWinY(int win_y)
+{
 	sqlite3 *db = Amphora_GetDB();
 	sqlite3_stmt *stmt;
 	const char *sql = "UPDATE prefs SET win_y=? WHERE uuid=?;";
@@ -85,7 +89,8 @@ Amphora_SaveWinY(int win_y) {
 }
 
 int
-Amphora_SaveWinFlags(Uint32 win_flags) {
+Amphora_SaveWinFlags(Uint32 win_flags)
+{
 	sqlite3 *db = Amphora_GetDB();
 	sqlite3_stmt *stmt;
 	const char *sql = "UPDATE prefs SET win_flags=? WHERE uuid=?;";
@@ -100,13 +105,14 @@ Amphora_SaveWinFlags(Uint32 win_flags) {
 }
 
 int
-Amphora_SaveFPS(Uint32 framerate) {
+Amphora_SaveFPS(Uint32 fps)
+{
 	sqlite3 *db = Amphora_GetDB();
 	sqlite3_stmt *stmt;
 	const char *sql = "UPDATE prefs SET framerate=? WHERE uuid=?;";
 
 	sqlite3_prepare_v2(db, sql, (int)SDL_strlen(sql), &stmt, NULL);
-	sqlite3_bind_int64(stmt, 1, framerate);
+	sqlite3_bind_int64(stmt, 1, fps);
 	sqlite3_bind_text(stmt, 2, uuid, -1, NULL);
 	sqlite3_step(stmt);
 	sqlite3_finalize(stmt);
@@ -115,7 +121,8 @@ Amphora_SaveFPS(Uint32 framerate) {
 }
 
 Sint32
-Amphora_LoadWinX(void) {
+Amphora_LoadWinX(void)
+{
 	sqlite3 *db = Amphora_GetDB();
 	sqlite3_stmt *stmt;
 	const char *sql = "SELECT win_x FROM prefs WHERE uuid=?";
@@ -123,7 +130,8 @@ Amphora_LoadWinX(void) {
 
 	sqlite3_prepare_v2(db, sql, (int)SDL_strlen(sql), &stmt, NULL);
 	sqlite3_bind_text(stmt, 1, uuid, -1, NULL);
-	if (sqlite3_step(stmt) != SQLITE_ROW) {
+	if (sqlite3_step(stmt) != SQLITE_ROW)
+	{
 		sqlite3_finalize(stmt);
 		return window_x;
 	}
@@ -134,7 +142,8 @@ Amphora_LoadWinX(void) {
 }
 
 Sint32
-Amphora_LoadWinY(void) {
+Amphora_LoadWinY(void)
+{
 	sqlite3 *db = Amphora_GetDB();
 	sqlite3_stmt *stmt;
 	const char *sql = "SELECT win_y FROM prefs WHERE uuid=?";
@@ -142,7 +151,8 @@ Amphora_LoadWinY(void) {
 
 	sqlite3_prepare_v2(db, sql, (int)SDL_strlen(sql), &stmt, NULL);
 	sqlite3_bind_text(stmt, 1, uuid, -1, NULL);
-	if (sqlite3_step(stmt) != SQLITE_ROW) {
+	if (sqlite3_step(stmt) != SQLITE_ROW)
+	{
 		sqlite3_finalize(stmt);
 		return window_y;
 	}
@@ -153,7 +163,8 @@ Amphora_LoadWinY(void) {
 }
 
 Uint32
-Amphora_LoadWinFlags(void) {
+Amphora_LoadWinFlags(void)
+{
 	sqlite3 *db = Amphora_GetDB();
 	sqlite3_stmt *stmt;
 	const char *sql = "SELECT win_flags FROM prefs WHERE uuid=?";
@@ -161,7 +172,8 @@ Amphora_LoadWinFlags(void) {
 
 	sqlite3_prepare_v2(db, sql, (int)SDL_strlen(sql), &stmt, NULL);
 	sqlite3_bind_text(stmt, 1, uuid, -1, NULL);
-	if (sqlite3_step(stmt) != SQLITE_ROW) {
+	if (sqlite3_step(stmt) != SQLITE_ROW)
+	{
 		sqlite3_finalize(stmt);
 		return window_flags;
 	}
@@ -172,7 +184,8 @@ Amphora_LoadWinFlags(void) {
 }
 
 Sint32
-Amphora_LoadFPS(void) {
+Amphora_LoadFPS(void)
+{
 	sqlite3 *db = Amphora_GetDB();
 	sqlite3_stmt *stmt;
 	const char *sql = "SELECT framerate FROM prefs WHERE uuid=?";
@@ -180,7 +193,8 @@ Amphora_LoadFPS(void) {
 
 	sqlite3_prepare_v2(db, sql, (int)SDL_strlen(sql), &stmt, NULL);
 	sqlite3_bind_text(stmt, 1, uuid, -1, NULL);
-	if (sqlite3_step(stmt) != SQLITE_ROW) {
+	if (sqlite3_step(stmt) != SQLITE_ROW)
+	{
 		sqlite3_finalize(stmt);
 		return framerate;
 	}
@@ -195,7 +209,8 @@ Amphora_LoadFPS(void) {
  */
 
 static SDL_GUID
-Amphora_GetUUID(void) {
+Amphora_GetUUID(void)
+{
 	char *path = Amphora_HeapStrdup(SDL_GetPrefPath(game_author, game_title));
 	SDL_RWops *rw;
 	char *file_contents;
@@ -203,11 +218,13 @@ Amphora_GetUUID(void) {
 	char guid_str[33];
 
 	Amphora_ConcatString(&path, "uuid");
-	if ((rw = SDL_RWFromFile(path, "rb"))) {
+	if ((rw = SDL_RWFromFile(path, "rb")))
+	{
 #ifdef DEBUG
 		SDL_Log("Loading UUID from file...\n");
 #endif
-		if (!((file_contents = Amphora_HeapAlloc(SDL_RWsize(rw), MEM_STRING)))) {
+		if (!((file_contents = Amphora_HeapAlloc(SDL_RWsize(rw), MEM_STRING))))
+		{
 			Amphora_HeapFree(path);
 			SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Failed to allocate space for UUID!\n");
 			SDL_memset(&guid, 0, sizeof(guid));

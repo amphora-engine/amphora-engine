@@ -3,14 +3,16 @@
 #include "internal/tilemap.h"
 
 bool
-Amphora_CheckCollisionInterface(const IAmphoraCollidable *obj_a, const IAmphoraCollidable *obj_b) {
+Amphora_CheckCollisionInterface(const IAmphoraCollidable *obj_a, const IAmphoraCollidable *obj_b)
+{
 	return SDL_HasIntersectionF(&obj_a->rectangle, &obj_b->rectangle);
 }
 
 AmphoraCollision
-Amphora_CheckObjectGroupCollisionInterface(const IAmphoraCollidable *obj, const char *name) {
+Amphora_CheckObjectGroupCollisionInterface(const IAmphoraCollidable *obj, const char *name)
+{
 	int i, j;
-	Uint32 c;
+	int c;
 	float o_sx, o_ex, o_sy, o_ey, r_sx, r_ex, r_sy, r_ey;
 	float overlaps[4];
 	AmphoraCollision dirs[] = {
@@ -22,10 +24,13 @@ Amphora_CheckObjectGroupCollisionInterface(const IAmphoraCollidable *obj, const 
 	int min_overlap = 0;
 	SDL_FRect *rects;
 
-	if ((rects = Amphora_GetRectsByGroup(name, &c)) == NULL) return AMPHORA_COLLISION_NONE;
+	if ((rects = Amphora_GetRectsByGroup(name, &c)) == NULL)
+		return AMPHORA_COLLISION_NONE;
 
-	for (i = 0; i < c; i++) {
-		if (SDL_HasIntersectionF(&obj->rectangle, &rects[i])) {
+	for (i = 0; i < c; i++)
+	{
+		if (SDL_HasIntersectionF(&obj->rectangle, &rects[i]))
+		{
 			o_sx = obj->rectangle.x;
 			o_ex = o_sx + obj->rectangle.w;
 			o_sy = obj->rectangle.y;
@@ -40,10 +45,10 @@ Amphora_CheckObjectGroupCollisionInterface(const IAmphoraCollidable *obj, const 
 			overlaps[2] = SDL_fabsf(o_ey - r_sy);
 			overlaps[3] = SDL_fabsf(o_sy - r_ey);
 
-			for (j = 1; j < 4; j++) {
-				if (overlaps[j] < overlaps[min_overlap]) {
+			for (j = 1; j < 4; j++)
+			{
+				if (overlaps[j] < overlaps[min_overlap])
 					min_overlap = j;
-				}
 			}
 
 			return dirs[min_overlap];

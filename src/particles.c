@@ -11,13 +11,29 @@
 SDL_FPoint Amphora_CalculateParticleStartPosition(float start_x, float start_y, int spread_x, int spread_y);
 
 AmphoraEmitter *
-Amphora_CreateEmitter(float x, float y, float w, float h, float start_x, float start_y, int spread_x, int spread_y, int count, float p_w, float p_h, SDL_Color color, bool stationary, Sint32 order, void (*update_fn)(int, int, AmphoraParticle *, AmphoraParticleExt *, const SDL_FRect *)) {
+Amphora_CreateEmitter(float x,
+			float y,
+			float w,
+			float h,
+			float start_x,
+			float start_y,
+			int spread_x,
+			int spread_y,
+			int count,
+			float p_w,
+			float p_h,
+			SDL_Color color,
+			bool stationary,
+			Sint32 order,
+			void (*update_fn)(int, int, AmphoraParticle *, AmphoraParticleExt *, const SDL_FRect *))
+{
 	AmphoraEmitter *emitter = NULL;
 	struct render_list_node_t *render_list_node = NULL;
 	SDL_FPoint position;
 	int i;
 
-	if ((emitter = Amphora_HeapAlloc(sizeof(AmphoraEmitter), MEM_EMITTER)) == NULL) {
+	if ((emitter = Amphora_HeapAlloc(sizeof(AmphoraEmitter), MEM_EMITTER)) == NULL)
+	{
 		Amphora_SetError(AMPHORA_STATUS_ALLOC_FAIL, "Failed to initialize emitter");
 
 		return NULL;
@@ -25,16 +41,19 @@ Amphora_CreateEmitter(float x, float y, float w, float h, float start_x, float s
 	render_list_node = Amphora_AddRenderListNode(order);
 
 	emitter->type = AMPH_OBJ_EMITTER;
-	if (!((emitter->texture = SDL_CreateTexture(Amphora_GetRenderer(), SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_TARGET, (int)w, (int)h)))) {
+	if (!((emitter->texture = SDL_CreateTexture(Amphora_GetRenderer(), SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_TARGET, (int)w, (int)h))))
+	{
 		Amphora_SetError(AMPHORA_STATUS_ALLOC_FAIL, "Failed to create emitter texture");
 		goto fail_texture;
 	}
 	emitter->rectangle = (SDL_FRect) { x, y, w, h };
-	if (!((emitter->particles = Amphora_HeapAlloc(count * sizeof(AmphoraParticle), MEM_EMITTER)))) {
+	if (!((emitter->particles = Amphora_HeapAlloc(count * sizeof(AmphoraParticle), MEM_EMITTER))))
+	{
 		Amphora_SetError(AMPHORA_STATUS_ALLOC_FAIL, "Failed to allocate particles");
 		goto fail_particles;
 	}
-	if (!((emitter->particle_data = Amphora_HeapAlloc(count * sizeof(AmphoraParticleExt), MEM_EMITTER)))) {
+	if (!((emitter->particle_data = Amphora_HeapAlloc(count * sizeof(AmphoraParticleExt), MEM_EMITTER))))
+	{
 		Amphora_SetError(AMPHORA_STATUS_ALLOC_FAIL, "Failed to allocate particle data");
 		goto fail_data;
 	}
@@ -51,7 +70,8 @@ Amphora_CreateEmitter(float x, float y, float w, float h, float start_x, float s
 
 	(void)SDL_SetTextureBlendMode(emitter->texture, SDL_BLENDMODE_BLEND);
 
-	for (i = 0; i < count; i++) {
+	for (i = 0; i < count; i++)
+	{
 		position = Amphora_CalculateParticleStartPosition(start_x, start_y, spread_x, spread_y);
 		emitter->particles[i].x = position.x;
 		emitter->particles[i].y = position.y;
@@ -78,7 +98,8 @@ Amphora_CreateEmitter(float x, float y, float w, float h, float start_x, float s
 }
 
 int
-Amphora_DestroyEmitter(AmphoraEmitter *emitter) {
+Amphora_DestroyEmitter(AmphoraEmitter *emitter)
+{
 	if (!emitter) return AMPHORA_STATUS_FAIL_UNDEFINED;
 
 	SDL_DestroyTexture(emitter->texture);
@@ -95,7 +116,8 @@ Amphora_DestroyEmitter(AmphoraEmitter *emitter) {
  */
 
 void
-Amphora_UpdateAndRenderParticleEmitter(AmphoraEmitter *emitter) {
+Amphora_UpdateAndRenderParticleEmitter(AmphoraEmitter *emitter)
+{
 	SDL_Renderer *renderer = Amphora_GetRenderer();
 	SDL_Color color = { 0, 0, 0, 0 };
 	SDL_FRect dst;
@@ -106,10 +128,12 @@ Amphora_UpdateAndRenderParticleEmitter(AmphoraEmitter *emitter) {
 	(void)SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
 	(void)SDL_RenderClear(renderer);
 
-	for (i = 0; i < emitter->particles_count; i++) {
+	for (i = 0; i < emitter->particles_count; i++)
+	{
 		if (emitter->update) emitter->update(i, emitter->particles_count, emitter->particles, emitter->particle_data, &emitter->rectangle);
 		if (emitter->particle_data[i].hidden) continue;
-		if (SDL_memcmp(&color, &emitter->particles[i].color, sizeof(SDL_Color)) != 0) {
+		if (SDL_memcmp(&color, &emitter->particles[i].color, sizeof(SDL_Color)) != 0)
+		{
 			(void)SDL_memcpy(&color, &emitter->particles[i].color, sizeof(SDL_Color));
 			(void)SDL_SetRenderDrawColor(
 				renderer,
@@ -119,13 +143,14 @@ Amphora_UpdateAndRenderParticleEmitter(AmphoraEmitter *emitter) {
 				color.a
 			);
 		}
-		dst = (SDL_FRect) {
+		dst = (SDL_FRect){
 			emitter->particles[i].x,
 			emitter->particles[i].y,
 			emitter->particles[i].w,
 			emitter->particles[i].h
 		};
-		if (!emitter->render_list_node->stationary) {
+		if (!emitter->render_list_node->stationary)
+		{
 			dst.x -= camera.x;
 			dst.y -= camera.y;
 		}
@@ -140,7 +165,8 @@ Amphora_UpdateAndRenderParticleEmitter(AmphoraEmitter *emitter) {
  */
 
 SDL_FPoint
-Amphora_CalculateParticleStartPosition(float start_x, float start_y, int spread_x, int spread_y) {
+Amphora_CalculateParticleStartPosition(float start_x, float start_y, int spread_x, int spread_y)
+{
 	return (SDL_FPoint) {
 		start_x + (float)(Amphora_GetRandom(spread_x) - spread_x / 2.0),
 		start_y + (float)(Amphora_GetRandom(spread_y) - spread_y / 2.0),

@@ -10,17 +10,22 @@ static struct amphora_typewriter_t typewriters[MAX_CONCURRENT_TYPEWRITERS];
 static unsigned int typewriters_count;
 
 TypewriterStatus
-Amphora_TypeString(AmphoraString *string, Uint32 ms, void (*callback)(int, char)) {
+Amphora_TypeString(AmphoraString *string, Uint32 ms, void (*callback)(int, char))
+{
 	int i;
 
 	if (!string) return TYPEWRITER_NOSTRING;
-	if (Amphora_GetStringLength(string) == Amphora_GetNumCharactersDisplayed(string)) return TYPEWRITER_DONE;
+	if (Amphora_GetStringLength(string) == Amphora_GetNumCharactersDisplayed(string))
+		return TYPEWRITER_DONE;
 
-	for (i = 0; i < MAX_CONCURRENT_TYPEWRITERS; i++) {
+	for (i = 0; i < MAX_CONCURRENT_TYPEWRITERS; i++)
+	{
 		if (typewriters[i].string == string) break;
 	}
-	if (i == MAX_CONCURRENT_TYPEWRITERS) {
-		if (typewriters_count == MAX_CONCURRENT_TYPEWRITERS) {
+	if (i == MAX_CONCURRENT_TYPEWRITERS)
+	{
+		if (typewriters_count == MAX_CONCURRENT_TYPEWRITERS)
+		{
 			SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Cannot create typewriter, concurrent limit exceeded!\n");
 
 			return TYPEWRITER_ERROR;
@@ -41,7 +46,8 @@ Amphora_TypeString(AmphoraString *string, Uint32 ms, void (*callback)(int, char)
 	typewriters[i].last_update = SDL_GetTicks();
 	if (callback) callback(typewriters[i].ticker, Amphora_GetStringCharAtIndex(string, typewriters[i].ticker));
 	(void)Amphora_UpdateStringCharsDisplayed(string, ++typewriters[i].ticker);
-	if (typewriters[i].ticker == Amphora_GetStringLength(string)) {
+	if (typewriters[i].ticker == (ssize_t)Amphora_GetStringLength(string))
+	{
 		typewriters[i].used = false;
 		typewriters[i].string = NULL;
 		typewriters_count--;
@@ -53,16 +59,19 @@ Amphora_TypeString(AmphoraString *string, Uint32 ms, void (*callback)(int, char)
 }
 
 TypewriterStatus
-Amphora_SetStringTypeSpeed(AmphoraString *string, Uint32 ms) {
+Amphora_SetStringTypeSpeed(AmphoraString *string, Uint32 ms)
+{
 	int i;
 
 	if (!string) return TYPEWRITER_NOSTRING;
 	if (Amphora_GetStringLength(string) == Amphora_GetNumCharactersDisplayed(string)) return TYPEWRITER_DONE;
 
-	for (i = 0; i < MAX_CONCURRENT_TYPEWRITERS; i++) {
+	for (i = 0; i < MAX_CONCURRENT_TYPEWRITERS; i++)
+	{
 		if (typewriters[i].string == string) break;
 	}
-	if (i == MAX_CONCURRENT_TYPEWRITERS && typewriters_count == MAX_CONCURRENT_TYPEWRITERS) return TYPEWRITER_ERROR;
+	if (i == MAX_CONCURRENT_TYPEWRITERS && typewriters_count == MAX_CONCURRENT_TYPEWRITERS)
+		return TYPEWRITER_ERROR;
 
 	typewriters[i].ms = ms;
 

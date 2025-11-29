@@ -5,7 +5,8 @@
 
 struct amphora_typewriter_t {
 	AmphoraString *string;
-	Uint32 ticker, ms, last_update;
+	Uint32 ms, last_update;
+	int ticker;
 	bool used : 1;
 };
 

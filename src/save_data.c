@@ -3,7 +3,8 @@
 #include "internal/save_data.h"
 
 int
-Amphora_SaveNumber(const char *attribute, double value) {
+Amphora_SaveNumber(const char *attribute, double value)
+{
 	sqlite3 *db = Amphora_GetDB();
 	sqlite3_stmt *stmt;
 	const char *sql = "INSERT OR REPLACE INTO save_data (attribute, value) VALUES (?, ?);";
@@ -18,7 +19,8 @@ Amphora_SaveNumber(const char *attribute, double value) {
 }
 
 int
-Amphora_SaveString(const char *attribute, const char *value) {
+Amphora_SaveString(const char *attribute, const char *value)
+{
 	sqlite3 *db = Amphora_GetDB();
 	sqlite3_stmt *stmt;
 	const char *sql = "INSERT OR REPLACE INTO save_data (attribute, value) VALUES (?, ?);";
@@ -33,7 +35,8 @@ Amphora_SaveString(const char *attribute, const char *value) {
 }
 
 double
-Amphora_LoadNumber(const char *attribute, double default_value) {
+Amphora_LoadNumber(const char *attribute, double default_value)
+{
 	sqlite3 *db = Amphora_GetDB();
 	sqlite3_stmt *stmt;
 	const char *sql = "SELECT value FROM save_data WHERE attribute=?";
@@ -41,7 +44,8 @@ Amphora_LoadNumber(const char *attribute, double default_value) {
 
 	sqlite3_prepare_v2(db, sql, (int)SDL_strlen(sql), &stmt, NULL);
 	sqlite3_bind_text(stmt, 1, attribute, -1, NULL);
-	if (sqlite3_step(stmt) != SQLITE_ROW) {
+	if (sqlite3_step(stmt) != SQLITE_ROW)
+	{
 		sqlite3_finalize(stmt);
 		return default_value;
 	}
@@ -52,14 +56,16 @@ Amphora_LoadNumber(const char *attribute, double default_value) {
 }
 
 int
-Ampohra_LoadString(const char *attribute, char **out_string) {
+Ampohra_LoadString(const char *attribute, char **out_string)
+{
 	sqlite3 *db = Amphora_GetDB();
 	sqlite3_stmt *stmt;
 	const char *sql = "SELECT value FROM save_data WHERE attribute=?";
 
 	sqlite3_prepare_v2(db, sql, (int)SDL_strlen(sql), &stmt, NULL);
 	sqlite3_bind_text(stmt, 1, attribute, -1, NULL);
-	if (sqlite3_step(stmt) != SQLITE_ROW) {
+	if (sqlite3_step(stmt) != SQLITE_ROW)
+	{
 		sqlite3_finalize(stmt);
 		return -1;
 	}
@@ -74,14 +80,16 @@ Ampohra_LoadString(const char *attribute, char **out_string) {
  */
 
 int
-Amphora_InitSave(void) {
+Amphora_InitSave(void)
+{
 	sqlite3 *db = Amphora_GetDB();
 	const char *sql = "CREATE TABLE IF NOT EXISTS save_data("
 			  "attribute TEXT PRIMARY KEY NOT NULL,"
 			  "value ANY);";
 	char *err_msg;
 	sqlite3_exec(db, sql, NULL, NULL, &err_msg);
-	if (err_msg) {
+	if (err_msg)
+	{
 		SDL_Log("%s\n", err_msg);
 		return -1;
 	}

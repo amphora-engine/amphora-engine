@@ -6,17 +6,20 @@ static AmphoraStatusCode err_code;
 static void (*catastrophe_handler)(void) = NULL;
 
 const char *
-Amphora_GetError(void) {
+Amphora_GetError(void)
+{
 	return err_buff;
 }
 
 AmphoraStatusCode
-Amphora_GetErrorCode(void) {
+Amphora_GetErrorCode(void)
+{
 	return err_code;
 }
 
 void
-Amphora_SetCatastropheHandler(void (*func)(void)) {
+Amphora_SetCatastropheHandler(void (*func)(void))
+{
 	catastrophe_handler = func;
 }
 
@@ -25,7 +28,8 @@ Amphora_SetCatastropheHandler(void (*func)(void)) {
  */
 
 void
-Amphora_SetError(AmphoraStatusCode status_code, const char *fmt, ...) {
+Amphora_SetError(AmphoraStatusCode status_code, const char *fmt, ...)
+{
 	va_list args;
 
 	va_start(args, fmt);
@@ -34,7 +38,8 @@ Amphora_SetError(AmphoraStatusCode status_code, const char *fmt, ...) {
 }
 
 void
-Amphora_HandleCatastrophicFailure(void) {
+Amphora_HandleCatastrophicFailure(void)
+{
 	/*
 	 * TODO: implement catastrophe handler
 	 */

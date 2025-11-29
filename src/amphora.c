@@ -26,48 +26,58 @@ static Uint32 framerate;
 static bool quit_requested = false;
 
 int
-Amphora_StartEngine(void) {
+Amphora_StartEngine(void)
+{
 	SDL_Event e;
 
 	/*
 	 * TODO: check Init* error codes
 	 */
 	Amphora_InitHeap();
-	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER) < 0) {
+	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER) < 0)
+	{
 		Amphora_SetError(AMPHORA_STATUS_CORE_FAIL, "Failed to init SDL: %s", SDL_GetError());
 		return AMPHORA_STATUS_CORE_FAIL;
 	}
 
-	if (IMG_Init(IMG_INIT_PNG) < 0) {
+	if (IMG_Init(IMG_INIT_PNG) < 0)
+	{
 		Amphora_SetError(AMPHORA_STATUS_CORE_FAIL, "Failed to init SDL_image: %s", SDL_GetError());
 		return AMPHORA_STATUS_CORE_FAIL;
 	}
 
-	if (Mix_Init(MIX_INIT_OGG) < 0) {
+	if (Mix_Init(MIX_INIT_OGG) < 0)
+	{
 		Amphora_SetError(AMPHORA_STATUS_CORE_FAIL, "Failed to init SDL_mixer: %s", SDL_GetError());
 		return AMPHORA_STATUS_CORE_FAIL;
 	}
-	if (Mix_OpenAudio(44100, AUDIO_S16SYS, 2, 2048) < 0) {
+	if (Mix_OpenAudio(44100, AUDIO_S16SYS, 2, 2048) < 0)
+	{
 		Amphora_SetError(AMPHORA_STATUS_CORE_FAIL, "Failed to open audio device: %s", SDL_GetError());
 		return AMPHORA_STATUS_CORE_FAIL;
 	}
-	if (Amphora_InitSFX() == -1) {
+	if (Amphora_InitSFX() == -1)
+	{
 		Amphora_SetError(AMPHORA_STATUS_CORE_FAIL, "Failed to load sfx data");
 		return AMPHORA_STATUS_CORE_FAIL;
 	}
-	if (Amphora_InitMusic() == -1) {
+	if (Amphora_InitMusic() == -1)
+	{
 		Amphora_SetError(AMPHORA_STATUS_CORE_FAIL, "Failed to load music data");
 		return AMPHORA_STATUS_CORE_FAIL;
 	}
-	if (TTF_Init() < 0) {
+	if (TTF_Init() < 0)
+	{
 		Amphora_SetError(AMPHORA_STATUS_CORE_FAIL, "Failed to init SDL_ttf: %s", SDL_GetError());
 		return AMPHORA_STATUS_CORE_FAIL;
 	}
-	if (Amphora_InitFonts() == -1) {
+	if (Amphora_InitFonts() == -1)
+	{
 		Amphora_SetError(AMPHORA_STATUS_CORE_FAIL,"Failed to load TTF font data");
 		return AMPHORA_STATUS_CORE_FAIL;
 	}
-	if (Amphora_InitMaps() == -1) {
+	if (Amphora_InitMaps() == -1)
+	{
 		Amphora_SetError(AMPHORA_STATUS_CORE_FAIL,"Failed to load tilemap data");
 		return AMPHORA_STATUS_CORE_FAIL;
 	}
@@ -75,7 +85,8 @@ Amphora_StartEngine(void) {
 	Amphora_InitDB();
 	Amphora_InitConfig();
 	Amphora_InitEvents();
-	if (Amphora_InitRender() == -1) {
+	if (Amphora_InitRender() == -1)
+	{
 		Amphora_SetError(AMPHORA_STATUS_CORE_FAIL,"Failed to init renderer");
 		return AMPHORA_STATUS_CORE_FAIL;
 	}
@@ -102,17 +113,20 @@ Amphora_StartEngine(void) {
 }
 
 void
-Amphora_QuitGame(void) {
+Amphora_QuitGame(void)
+{
 	quit_requested = true;
 }
 
 Uint32
-Amphora_GetFrame(void) {
+Amphora_GetFrame(void)
+{
 	return frame_count;
 }
 
 Uint32
-Amphora_GetFPS(void) {
+Amphora_GetFPS(void)
+{
 	return framerate;
 }
 
@@ -121,7 +135,8 @@ Amphora_GetFPS(void) {
  */
 
 static int
-Amphora_MainLoop(SDL_Event *e) {
+Amphora_MainLoop(SDL_Event *e)
+{
 	static Uint32 frame_start, frame_end;
 	static Uint32 frame_time, remaining_time;
 
@@ -129,9 +144,9 @@ Amphora_MainLoop(SDL_Event *e) {
 	frame_count++;
 
 	if (Amphora_ProcessEventLoop(e) == SDL_QUIT) quit_requested = true;
-	if (quit_requested) {
+	if (quit_requested)
 		return 1;
-	}
+
 	Amphora_ClearBG();
 	if (Amphora_IsSceneUpdateLocked() == false)
 	{
@@ -146,12 +161,15 @@ Amphora_MainLoop(SDL_Event *e) {
 	SDL_RenderPresent(Amphora_GetRenderer());
 
 	frame_end = SDL_GetTicks64();
-	if ((frame_time = frame_end - frame_start) < 1000 / framerate) {
+	if ((frame_time = frame_end - frame_start) < 1000 / framerate)
+	{
 		remaining_time = 1000 / framerate - frame_time;
 		remaining_time = Amphora_HeapHousekeeping(remaining_time);
 		SDL_Delay(remaining_time);
 #ifdef DEBUG
-	} else if (frame_time > (1000 / framerate)) {
+	}
+	else if (frame_time > 1000 / framerate)
+	{
 		SDL_Log("Lag on frame %u (frame took %u ticks, %d ticks per frame)\n", frame_count, frame_end - frame_start, 1000 /
 			Amphora_GetFPS());
 	}
@@ -163,14 +181,16 @@ Amphora_MainLoop(SDL_Event *e) {
 }
 
 static void
-Amphora_SaveConfig(void) {
+Amphora_SaveConfig(void)
+{
 	/*
 	 * TODO: Check Save* error codes
 	 */
 	Vector2 win_size = Amphora_GetResolution();
 	Uint32 win_flags = SDL_GetWindowFlags(Amphora_GetWindow());
 
-	if (!Amphora_IsWindowFullscreen()) {
+	if (!Amphora_IsWindowFullscreen())
+	{
 		Amphora_SaveWinX(win_size.x);
 		Amphora_SaveWinY(win_size.y);
 	}
@@ -179,7 +199,8 @@ Amphora_SaveConfig(void) {
 }
 
 static void
-Amphora_CleanResources(void) {
+Amphora_CleanResources(void)
+{
 	Amphora_DestroyScene();
 	Amphora_DeInitSceneManager();
 	Amphora_DeInitEvents();

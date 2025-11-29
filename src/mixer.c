@@ -17,12 +17,14 @@ static const char **music_paths;
 static int music_count;
 
 void
-Amphora_PlaySFX(const char *name, const int channel, const int repeat) {
+Amphora_PlaySFX(const char *name, const int channel, const int repeat)
+{
 	SDL_RWops *sfx_rw = NULL;
 	Mix_Chunk *sfx_chunk = NULL;
 	int v;
 
-	if (HT_GetValue(name, open_sfx) == -1) {
+	if (HT_GetValue(name, open_sfx) == -1)
+	{
 #ifdef DEBUG
 		SDL_Log("Loading sfx: %s\n", name);
 #endif
@@ -32,22 +34,27 @@ Amphora_PlaySFX(const char *name, const int channel, const int repeat) {
 	if (channel > -1 && Mix_Playing(channel)) return;
 	sfx_chunk = HT_GetRef(name, Mix_Chunk, open_sfx);
 
-	if (Mix_VolumeChunk(sfx_chunk, -1) != (v = (int)HT_GetStatus(name, sfx))) Mix_VolumeChunk(sfx_chunk, v);
+	if (Mix_VolumeChunk(sfx_chunk, -1) != (v = (int)HT_GetStatus(name, sfx)))
+		Mix_VolumeChunk(sfx_chunk, v);
+
 	(void)Mix_PlayChannel(channel, sfx_chunk, repeat);
 }
 
 void
-Amphora_SetSFXVolume(const char *name, int volume) {
+Amphora_SetSFXVolume(const char *name, int volume)
+{
 	if (HT_GetValue(name, sfx) == -1) return;
 
 	(void)HT_SetStatus(name, volume, sfx);
 }
 
 void
-Amphora_SetMusic(const char *name) {
+Amphora_SetMusic(const char *name)
+{
 	SDL_RWops *mus_rw = SDL_RWFromFile(HT_GetRef(name, char, music), "rb");
 
-	if (Mix_PlayingMusic()) {
+	if (Mix_PlayingMusic())
+	{
 		(void)Mix_HaltMusic();
 		Mix_FreeMusic(current_music);
 		current_music = NULL;
@@ -58,42 +65,48 @@ Amphora_SetMusic(const char *name) {
 }
 
 void
-Amphora_PlayMusic(int ms) {
+Amphora_PlayMusic(int ms)
+{
 	if (Mix_PlayingMusic()) return;
 
 	(void)Mix_FadeInMusic(current_music, -1, ms);
 }
 
 void
-Amphora_PlayMusicN(int n, int ms) {
+Amphora_PlayMusicN(int n, int ms)
+{
 	if (Mix_PlayingMusic()) return;
 
 	(void)Mix_FadeInMusic(current_music, n, ms);
 }
 
 void
-Amphora_PauseMusic(void) {
+Amphora_PauseMusic(void)
+{
 	if (!Mix_PlayingMusic()) return;
 
 	Mix_PauseMusic();
 }
 
 void
-Amphora_UnpauseMusic(void) {
+Amphora_UnpauseMusic(void)
+{
 	if (!Mix_PausedMusic()) return;
 
 	Mix_ResumeMusic();
 }
 
 void
-Amphora_StopMusic(void) {
+Amphora_StopMusic(void)
+{
 	if (!Mix_PlayingMusic()) return;
 
 	(void)Mix_HaltMusic();
 }
 
 void
-Amphora_FadeOutMusic(int ms) {
+Amphora_FadeOutMusic(int ms)
+{
 	if (!Mix_PlayingMusic()) return;
 
 	(void)Mix_FadeOutMusic(ms);
@@ -104,12 +117,14 @@ Amphora_FadeOutMusic(int ms) {
  */
 
 int
-Amphora_InitSFX(void) {
+Amphora_InitSFX(void)
+{
 	int i;
 
 	sfx = HT_NewTable();
 	open_sfx = HT_NewTable();
-	for (i = 0; i < sfx_count; i++) {
+	for (i = 0; i < sfx_count; i++)
+	{
 		HT_StoreRef(sfx_names[i], sfx_paths[i], sfx);
 		(void)HT_SetStatus(sfx_names[i], MIX_MAX_VOLUME, sfx);
 #ifdef DEBUG
@@ -121,11 +136,13 @@ Amphora_InitSFX(void) {
 }
 
 int
-Amphora_InitMusic(void) {
+Amphora_InitMusic(void)
+{
 	int i;
 
 	music = HT_NewTable();
-	for (i = 0; i < music_count; i++) {
+	for (i = 0; i < music_count; i++)
+	{
 		HT_StoreRef(music_names[i], music_paths[i], music);
 #ifdef DEBUG
 		SDL_Log("Found music %s\n", music_names[i]);
@@ -137,11 +154,14 @@ Amphora_InitMusic(void) {
 }
 
 void
-Amphora_FreeAllSFX(void) {
+Amphora_FreeAllSFX(void)
+{
 	int i;
 
-	for (i = 0; i < sfx_count; i++) {
-		if (HT_GetValue(sfx_names[i], open_sfx) != -1) {
+	for (i = 0; i < sfx_count; i++)
+	{
+		if (HT_GetValue(sfx_names[i], open_sfx) != -1)
+		{
 #ifdef DEBUG
 			SDL_Log("Unloading sfx: %s\n", sfx_names[i]);
 #endif
@@ -153,15 +173,18 @@ Amphora_FreeAllSFX(void) {
 }
 
 void
-Amphora_CloseSFX(void) {
+Amphora_CloseSFX(void)
+{
 	Amphora_FreeAllSFX();
 	HT_FreeTable(open_sfx);
 	HT_FreeTable(sfx);
 }
 
 void
-Amphora_CloseMusic(void) {
-	if (current_music && !Mix_FadingMusic()) {
+Amphora_CloseMusic(void)
+{
+	if (current_music && !Mix_FadingMusic())
+	{
 		Amphora_FreeMusic();
 	}
 	HT_FreeTable(music);
@@ -172,7 +195,8 @@ Amphora_CloseMusic(void) {
  */
 
 static void
-Amphora_FreeMusic(void) {
+Amphora_FreeMusic(void)
+{
 	Mix_FreeMusic(current_music);
 	current_music = NULL;
 }

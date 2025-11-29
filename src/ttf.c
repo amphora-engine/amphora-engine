@@ -17,18 +17,21 @@ static const char **font_paths;
 static int font_count;
 
 AmphoraString *
-Amphora_CreateString(const char *font_name, const int pt, const float x, const float y, const int order, const SDL_Color color, const bool stationary, const char *fmt, ...) {
+Amphora_CreateString(const char *font_name, const int pt, const float x, const float y, const int order, const SDL_Color color, const bool stationary, const char *fmt, ...)
+{
 	struct render_list_node_t *render_list_node = Amphora_AddRenderListNode(order);
 	struct amphora_message_t *msg;
 	SDL_RWops *font_rw;
 	char text[AMPHORA_MAX_STR_LEN];
 	va_list args;
 
-	if (HT_GetValue(font_name, fonts) == -1) {
+	if (HT_GetValue(font_name, fonts) == -1)
+	{
 		SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Unable to locate font %s\n", font_name);
 		return NULL;
 	}
-	if (HT_GetValue(font_name, open_fonts) == -1) {
+	if (HT_GetValue(font_name, open_fonts) == -1)
+	{
 #ifdef DEBUG
 		SDL_Log("Loading font: %s\n", font_name);
 #endif
@@ -38,15 +41,13 @@ Amphora_CreateString(const char *font_name, const int pt, const float x, const f
 	va_start(args, fmt);
 	(void)SDL_vsnprintf(text, sizeof(text), fmt, args);
 
-	if (!((msg = Amphora_HeapAlloc(sizeof(struct amphora_message_t), MEM_STRING)))) {
+	/* TODO: cleanup on fail */
+	if (!((msg = Amphora_HeapAlloc(sizeof(struct amphora_message_t), MEM_STRING))))
 		return NULL;
-	}
-	if (!((msg->text = Amphora_HeapAlloc(SDL_strlen(text) + 1, MEM_STRING)))) {
+	if (!((msg->text = Amphora_HeapAlloc(SDL_strlen(text) + 1, MEM_STRING))))
 		return NULL;
-	}
-	if (!((msg->n_buff = Amphora_HeapAlloc(SDL_strlen(text) + 1, MEM_STRING)))) {
+	if (!((msg->n_buff = Amphora_HeapAlloc(SDL_strlen(text) + 1, MEM_STRING))))
 		return NULL;
-	}
 
 	msg->type = AMPH_OBJ_TXT;
 	msg->font_ptr = HT_GetRef(font_name, TTF_Font, open_fonts);
@@ -68,27 +69,32 @@ Amphora_CreateString(const char *font_name, const int pt, const float x, const f
 }
 
 size_t
-Amphora_GetStringLength(const AmphoraString *msg) {
+Amphora_GetStringLength(const AmphoraString *msg)
+{
 	return msg->len;
 }
 
 size_t
-Amphora_GetNumCharactersDisplayed(const AmphoraString *msg) {
+Amphora_GetNumCharactersDisplayed(const AmphoraString *msg)
+{
 	return msg->n;
 }
 
 const char *
-Ampohra_GetStringText(AmphoraString *msg) {
+Ampohra_GetStringText(AmphoraString *msg)
+{
 	return msg->text;
 }
 
 char
-Amphora_GetStringCharAtIndex(const AmphoraString *msg, int idx) {
+Amphora_GetStringCharAtIndex(const AmphoraString *msg, int idx)
+{
 	return msg->text[idx];
 }
 
 AmphoraString *
-Amphora_UpdateStringText(AmphoraString *msg, const char *fmt, ...) {
+Amphora_UpdateStringText(AmphoraString *msg, const char *fmt, ...)
+{
 	va_list args;
 	char text[4096];
 
@@ -99,10 +105,12 @@ Amphora_UpdateStringText(AmphoraString *msg, const char *fmt, ...) {
 	Amphora_HeapFree(msg->text);
 	msg->len = SDL_strlen(text);
 	msg->text = Amphora_HeapStrdup(text);
-	if (!((msg->n_buff = Amphora_HeapRealloc(msg->n_buff, SDL_strlen(text) + 1, MEM_STRING)))) {
+	if (!((msg->n_buff = Amphora_HeapRealloc(msg->n_buff, SDL_strlen(text) + 1, MEM_STRING))))
+	{
 		return NULL;
 	}
-	if (!msg->text) {
+	if (!msg->text)
+	{
 		Amphora_SetError(AMPHORA_STATUS_ALLOC_FAIL, "Failed to set new string: %s", text);
 		return NULL;
 	}
@@ -113,7 +121,8 @@ Amphora_UpdateStringText(AmphoraString *msg, const char *fmt, ...) {
 }
 
 AmphoraString *
-Amphora_UpdateStringCharsDisplayed(AmphoraString *msg, size_t n) {
+Amphora_UpdateStringCharsDisplayed(AmphoraString *msg, size_t n)
+{
 	if (n > msg->len) n = 0;
 	msg->n = n;
 	SDL_DestroyTexture(msg->texture);
@@ -123,7 +132,8 @@ Amphora_UpdateStringCharsDisplayed(AmphoraString *msg, size_t n) {
 }
 
 void
-Amphora_FreeString(AmphoraString *msg) {
+Amphora_FreeString(AmphoraString *msg)
+{
 	if (!msg) return;
 
 	SDL_DestroyTexture(msg->texture);
@@ -134,19 +144,23 @@ Amphora_FreeString(AmphoraString *msg) {
 }
 
 void
-Amphora_RenderString(const AmphoraString *msg) {
+Amphora_RenderString(const AmphoraString *msg)
+{
 	SDL_FRect pos_adj;
 	const Vector2f camera = Amphora_GetCamera();
 	Vector2 logical_size = Amphora_GetRenderLogicalSize();
 
-	if (msg->render_list_node->stationary) {
+	if (msg->render_list_node->stationary)
+	{
 		pos_adj = (SDL_FRect){
 			.x = msg->rectangle.x > 0 ? msg->rectangle.x : (float) Amphora_GetResolution().x + msg->rectangle.x - msg->rectangle.w,
 			.y = msg->rectangle.y > 0 ? msg->rectangle.y : (float) Amphora_GetResolution().y + msg->rectangle.y - msg->rectangle.h,
 			.w = msg->rectangle.w,
 			.h = msg->rectangle.h
 		};
-	} else {
+	}
+	else
+	{
 		pos_adj = (SDL_FRect){
 			.x = msg->rectangle.x - camera.x,
 			.y = msg->rectangle.y - camera.y,
@@ -165,12 +179,14 @@ Amphora_RenderString(const AmphoraString *msg) {
  */
 
 int
-Amphora_InitFonts(void) {
+Amphora_InitFonts(void)
+{
 	int i;
 
 	fonts = HT_NewTable();
 	open_fonts = HT_NewTable();
-	for (i = 0; i < font_count; i++) {
+	for (i = 0; i < font_count; i++)
+	{
 		HT_StoreRef(font_names[i], font_paths[i], fonts);
 #ifdef DEBUG
 		SDL_Log("Found font %s\n", font_names[i]);
@@ -181,11 +197,14 @@ Amphora_InitFonts(void) {
 }
 
 void
-Amphora_FreeAllFonts(void) {
+Amphora_FreeAllFonts(void)
+{
 	int i;
 
-	for (i = 0; i < font_count; i++) {
-		if (HT_GetValue(font_names[i], open_fonts) != -1) {
+	for (i = 0; i < font_count; i++)
+	{
+		if (HT_GetValue(font_names[i], open_fonts) != -1)
+		{
 #ifdef DEBUG
             SDL_Log("Unloading font: %s\n", font_names[i]);
 #endif
@@ -198,7 +217,8 @@ Amphora_FreeAllFonts(void) {
 }
 
 void
-Amphora_CloseFonts(void) {
+Amphora_CloseFonts(void)
+{
 	Amphora_FreeAllFonts();
 	HT_FreeTable(fonts);
 	HT_FreeTable(open_fonts);
@@ -209,7 +229,8 @@ Amphora_CloseFonts(void) {
  */
 
 static SDL_Texture *
-Amphora_RenderStringToTexture(AmphoraString *msg) {
+Amphora_RenderStringToTexture(AmphoraString *msg)
+{
 	int pt = msg->pt;
 	int msg_rect_w, msg_rect_h;
 	size_t n = msg->n;
@@ -220,9 +241,8 @@ Amphora_RenderStringToTexture(AmphoraString *msg) {
 	SDL_Texture *texture = NULL;
 
 	if (n) (void)SDL_strlcpy(msg->n_buff, text, n + 1);
-	if (TTF_SetFontSize(font, pt) == -1) {
+	if (TTF_SetFontSize(font, pt) == -1)
 		SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Failed to set font size\n");
-	}
 
 	surface = TTF_RenderUTF8_Blended(font, n ? msg->n_buff : text, text_color);
 	texture = SDL_CreateTextureFromSurface(Amphora_GetRenderer(), surface);

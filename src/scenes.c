@@ -24,21 +24,25 @@ static int current_scene_name = 0;
 static AmphoraFader transition_fader;
 static SDL_Color fade_color = { 255, 255, 255, 255 };
 static SDL_Rect fade_rect;
+static bool scene_update_lock = false;
 
 int
-Amphora_LoadScene(const char *name) {
+Amphora_LoadScene(const char *name)
+{
 	Vector2 screen_size = Amphora_GetResolution();
 	long idx;
 	int i;
 
 	idx = HT_GetValue(name, scenes);
-	if (idx == -1) {
+	if (idx == -1)
+	{
 		Amphora_SetError(AMPHORA_STATUS_FAIL_UNDEFINED, "No scene %s", name);
 		return AMPHORA_STATUS_FAIL_UNDEFINED;
 	}
 	current_scene_name = (int)idx;
 
-	if (Amphora_RegisterEvent("amph_internal_scene_transition", Amphora_SceneTransitionEvent) == AMPHORA_STATUS_FAIL_UNDEFINED) {
+	if (Amphora_RegisterEvent("amph_internal_scene_transition", Amphora_SceneTransitionEvent) == AMPHORA_STATUS_FAIL_UNDEFINED)
+	{
 		Amphora_SetError(AMPHORA_STATUS_FAIL_UNDEFINED, "Scene transition event registration failed");
 		return AMPHORA_STATUS_FAIL_UNDEFINED;
 	}
@@ -46,12 +50,14 @@ Amphora_LoadScene(const char *name) {
 	fade_rect.w = screen_size.x;
 	fade_rect.h = screen_size.y;
 	transition_fader.frames = transition_fader.timer * Amphora_GetFPS() / 1000;
-	if (!((transition_fader.steps = Amphora_HeapAlloc((transition_fader.frames >> 1) * sizeof(Uint8), MEM_MISC)))) {
+	if (!((transition_fader.steps = Amphora_HeapAlloc((transition_fader.frames >> 1) * sizeof(Uint8), MEM_MISC))))
+	{
 		Amphora_SetError(AMPHORA_STATUS_ALLOC_FAIL, "Failed to allocate memory for fade steps\n");
 		Amphora_UnlockSceneUpdate();
 		return AMPHORA_STATUS_ALLOC_FAIL;
 	}
-	for (i = 0; i < transition_fader.frames >> 1; i++) {
+	for (i = 0; i < transition_fader.frames >> 1; i++)
+	{
 		transition_fader.steps[i] = i * 255 / ((transition_fader.frames >> 1) - 1);
 	}
 	transition_fader.idx = 0;
@@ -61,7 +67,8 @@ Amphora_LoadScene(const char *name) {
 }
 
 int
-Amphora_SetSceneFadeParameters(Uint16 ms, SDL_Color color) {
+Amphora_SetSceneFadeParameters(Uint16 ms, SDL_Color color)
+{
 	transition_fader.timer = ms;
 	fade_color = color;
 
@@ -73,47 +80,49 @@ Amphora_SetSceneFadeParameters(Uint16 ms, SDL_Color color) {
  */
 
 void
-Amphora_InitSceneManager(void) {
+Amphora_InitSceneManager(void)
+{
 	int i;
 
 	scenes = HT_NewTable();
-	for (i = 0; i < scenes_count; i++) {
+	for (i = 0; i < scenes_count; i++)
+	{
 		(void)HT_SetValue(scene_names[i], i, scenes);
 	}
 }
 
 void
-Amphora_DeInitSceneManager(void) {
+Amphora_DeInitSceneManager(void)
+{
 	HT_FreeTable(scenes);
 }
 
 void
-Amphora_InitScene(void) {
+Amphora_InitScene(void)
+{
 	scene_structs[current_scene_idx].init_func();
 	Amphora_UnlockSceneUpdate();
 }
 
 void
-Amphora_UpdateScene(Uint32 frame_count) {
+Amphora_UpdateScene(Uint32 frame_count)
+{
 	scene_structs[current_scene_idx].update_func(frame_count, Amphora_GetKeyActionState());
 }
 
 void
-Amphora_DestroyScene(void) {
+Amphora_DestroyScene(void)
+{
 	scene_structs[current_scene_idx].destroy_func();
-#ifndef DISABLE_TILEMAP
 	Amphora_DestroyCurrentMap();
 	Amphora_FreeObjectGroup();
-#endif
-#ifndef DISABLE_MIXER
 	Amphora_FreeAllSFX();
-#endif
 	Amphora_ResetRenderList();
 	Amphora_UnboundCamera();
 	Amphora_FreeAllIMG();
-#ifndef DISABLE_FONTS
 	Amphora_FreeAllFonts();
-#endif
+}
+
 bool
 Amphora_IsSceneUpdateLocked(void)
 {
@@ -123,12 +132,18 @@ Amphora_IsSceneUpdateLocked(void)
 void
 Amphora_LockSceneUpdate(void)
 {
+#ifdef DEBUG
+	SDL_Log("Scene update locked\n");
+#endif
 	scene_update_lock = true;
 }
 
 void
 Amphora_UnlockSceneUpdate(void)
 {
+#ifdef DEBUG
+	SDL_Log("Scene update unlocked\n");
+#endif
 	scene_update_lock = false;
 }
 
@@ -137,10 +152,12 @@ Amphora_UnlockSceneUpdate(void)
  */
 
 static void
-Amphora_SceneTransitionEvent(void) {
+Amphora_SceneTransitionEvent(void)
+{
 	SDL_Renderer *renderer = Amphora_GetRenderer();
 
-	if (!transition_fader.timer) {
+	if (!transition_fader.timer)
+	{
 		Amphora_DestroyScene();
 		current_scene_idx = HT_GetValue(scene_names[current_scene_name], scenes);
 		Amphora_InitScene();
@@ -151,14 +168,16 @@ Amphora_SceneTransitionEvent(void) {
 	(void)SDL_SetRenderDrawColor(renderer, fade_color.r, fade_color.g, fade_color.b, transition_fader.steps[transition_fader.idx]);
 	(void)SDL_RenderFillRect(renderer, &fade_rect);
 	transition_fader.idx += transition_fader.idx_mod;
-	if (transition_fader.idx == (transition_fader.frames >> 1) - 1) {
+	if (transition_fader.idx == (transition_fader.frames >> 1) - 1)
+	{
 		transition_fader.idx_mod = -1;
 		Amphora_DestroyScene();
 		current_scene_idx = HT_GetValue(scene_names[current_scene_name], scenes);
 		Amphora_InitScene();
 		Amphora_SetCamera(0, 0);
 	}
-	if (transition_fader.idx == 0 && transition_fader.idx_mod == -1) {
+	if (transition_fader.idx == 0 && transition_fader.idx_mod == -1)
+	{
 		Amphora_HeapFree(transition_fader.steps);
 		(void)Amphora_UnregisterEvent("amph_internal_scene_transition");
 	}
