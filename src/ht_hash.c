@@ -91,7 +91,7 @@ HT_IncreaseSizeRehash(struct hash_table_t *tbl) {
 		if (otbl[i].status > 0)
 		{
 			(void)HT_SetValue(otbl[i].key, otbl[i].data, tbl);
-			(void)HT_SetStatus(otbl[i].key, otbl[i].status, tbl);
+			(void)HT_SetStatus(otbl[i].key, otbl[i].user_data, tbl);
 		}
 	}
 	Amphora_HeapFree(otbl);
