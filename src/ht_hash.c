@@ -19,6 +19,7 @@ enum hash_status_e
 struct hash_entry_t
 {
 	intptr_t data;
+	intptr_t user_data;
 	unsigned hash;
 	enum hash_status_e status;
 	char key[MAX_KEY_LEN];
@@ -175,7 +176,7 @@ HT_SetValue(const char *key, intptr_t val, HT_HashTable t)
 	return i;
 }
 
-int
+intptr_t
 HT_GetStatus(const char *key, HT_HashTable t)
 {
 	unsigned hash = HT_GetHash(key);
@@ -183,27 +184,27 @@ HT_GetStatus(const char *key, HT_HashTable t)
 
 	if (!key) return 0;
 	if (t->table_entries[i].hash == hash && strcmp(t->table_entries[i].key, key) == 0)
-		return t->table_entries[i].status;
+		return t->table_entries[i].user_data;
 	i = HT_ProbeForBucket(t, key, hash, i, 0);
 	if (i == -1 || t->table_entries[i].hash != hash)
 	{
 		HT_SetError("Key %s does not exist in table", key);
 		return 0;
 	}
-	return t->table_entries[i].status;
+	return t->table_entries[i].user_data;
 }
 
 unsigned
-HT_SetStatus(const char *key, int val, HT_HashTable t)
+HT_SetStatus(const char *key, intptr_t val, HT_HashTable t)
 {
 	unsigned hash = HT_GetHash(key);
 	int i = (int)(hash & (t->size - 1));
 
-	if (!key || !t->table_entries[i].status) return 0;
+	if (!key || t->table_entries[i].status != HT_USED) return 0;
 	if (t->table_entries[i].hash && (t->table_entries[i].hash != hash || strcmp(t->table_entries[i].key, key) != 0))
 		i = HT_ProbeForBucket(t, key, hash, i, 1);
 
-	t->table_entries[i].status = val;
+	t->table_entries[i].user_data = val;
 
 	return i;
 }
