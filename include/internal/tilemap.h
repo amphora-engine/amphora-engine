@@ -31,6 +31,6 @@ void Amphora_DestroyCurrentMap(void);
 void Amphora_FreeObjectGroup(void);
 void Amphora_FreeAllObjectGroups(void);
 void Amphora_CloseMapHashTables(void);
-SDL_FRect *Amphora_GetRectsByGroup(const char *name, Uint32 *c);
+SDL_FRect *Amphora_GetRectsByGroup(const char *name, int *c);
 
 #endif /* AMPHORA_TILEMAP_INTERNAL_H */
