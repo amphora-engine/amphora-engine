@@ -6,7 +6,7 @@ if(NOT DEFINED CMAKE_TOOLCHAIN_FILE)
 	set(VCPKG_LIBRARY_LINKAGE static)
 endif()
 
-if (APPLE)
+if(APPLE)
     set(CMAKE_THREAD_LIBS_INIT "-lpthread")
 endif()
 
@@ -40,4 +40,8 @@ include_directories(
 )
 
 add_subdirectory(src)
-set_target_properties(amphora PROPERTIES OUTPUT_NAME "${CMAKE_PROJECT_NAME}-${AMPHORA_ENGINE_SUFFIX}-${AMPHORA_ENGINE_VERSION_STRING}")
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+	set_target_properties(amphora PROPERTIES OUTPUT_NAME "${CMAKE_PROJECT_NAME}-${AMPHORA_ENGINE_SUFFIX}-${AMPHORA_ENGINE_VERSION_STRING}-dbg")
+else()
+	set_target_properties(amphora PROPERTIES OUTPUT_NAME "${CMAKE_PROJECT_NAME}-${AMPHORA_ENGINE_SUFFIX}-${AMPHORA_ENGINE_VERSION_STRING}")
+endif()
