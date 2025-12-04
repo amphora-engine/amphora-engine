@@ -11,7 +11,7 @@ int Amphora_SaveString(const char *attribute, const char *value);
 /* Get the integer stored with keys attribute, returns default_value if attribute doesn't exist */
 double Amphora_LoadNumber(const char *attribute, double default_value);
 /* Get the string stored with keys attribute and store it in out_string */
-int Ampohra_LoadString(const char *attribute, char **out_string);
+int Amphora_LoadString(const char *attribute, char **out_string);
 #ifdef __cplusplus
 }
 #endif

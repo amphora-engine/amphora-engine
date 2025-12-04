@@ -56,7 +56,7 @@ Amphora_LoadNumber(const char *attribute, double default_value)
 }
 
 int
-Ampohra_LoadString(const char *attribute, char **out_string)
+Amphora_LoadString(const char *attribute, char **out_string)
 {
 	sqlite3 *db = Amphora_GetDB();
 	sqlite3_stmt *stmt;
