@@ -22,17 +22,6 @@ extern void Amphora_RegisterMusicData(const char **, const char **, int);
 typedef struct
 {
 	int version;
-#define AMPHORA_VFUNCTION_V1(ret, name, sig_args, p_sig_args, call_args) ret (*name) p_sig_args
-#define AMPHORA_FUNCTION_V1(ret, name, sig_args, call_args) ret (*name) sig_args
-#define AMPHORA_ROUTINE_V1(name, sig_args, call_args) void (*name) sig_args
-	#include "amphora_api.def"
-#undef AMPHORA_VFUNCTION_V1
-#undef AMPHORA_FUNCTION_V1
-#undef AMPHORA_ROUTINE_V1
-} AmphoraAPI;
-
-typedef struct
-{
 	int (*StartEngine)(void);
 	void (*RegisterGameData)(const char *, const char *);
 	void (*RegisterWindowTitle)(const char *);
@@ -44,6 +33,18 @@ typedef struct
 	void (*RegisterMapData)(const char **, const char **, int);
 	void (*RegisterSFXData)(const char **, const char **, int);
 	void (*RegisterMusicData)(const char **, const char **, int);
+	void *(*GetAPI)(int);
 } AmphoraStartup;
+
+typedef struct
+{
+#define AMPHORA_VFUNCTION_V1(ret, name, sig_args, p_sig_args, call_args) ret (*name) p_sig_args
+#define AMPHORA_FUNCTION_V1(ret, name, sig_args, call_args) ret (*name) sig_args
+#define AMPHORA_ROUTINE_V1(name, sig_args, call_args) void (*name) sig_args
+	#include "amphora_api.def"
+#undef AMPHORA_VFUNCTION_V1
+#undef AMPHORA_FUNCTION_V1
+#undef AMPHORA_ROUTINE_V1
+} AmphoraAPI_V1;
 
 #endif /* AMPHORA_AMPHORA_API_H */

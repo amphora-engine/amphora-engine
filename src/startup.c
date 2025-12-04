@@ -1,22 +1,31 @@
 #include "amphora.h"
 #include "amphora_api.h"
 
-static AmphoraAPI aapi;
 static AmphoraStartup ast;
+static AmphoraAPI_V1 aapi_v1;
 
-void
-Amphora_GetAPI(AmphoraAPI **api, AmphoraStartup **astart)
+static void *
+Amphora_GetAPI(int version)
 {
-	aapi.version = AMPHORA_API_VERSION;
+	switch (version)
+	{
+		case 1: return &aapi_v1;
+		default: return NULL;
+	}
+}
 
-#define AMPHORA_VFUNCTION_V1(ret, name, sig_args, p_sig_args, call_args) aapi.name = Amphora_##name
-#define AMPHORA_FUNCTION_V1(ret, name, sig_args, call_args) aapi.name = Amphora_##name
-#define AMPHORA_ROUTINE_V1(name, sig_args, call_args) aapi.name = Amphora_##name
+AmphoraStartup *
+Amphora_Connect(void)
+{
+#define AMPHORA_VFUNCTION_V1(ret, name, sig_args, p_sig_args, call_args) aapi_v1.name = Amphora_##name
+#define AMPHORA_FUNCTION_V1(ret, name, sig_args, call_args) aapi_v1.name = Amphora_##name
+#define AMPHORA_ROUTINE_V1(name, sig_args, call_args) aapi_v1.name = Amphora_##name
 	#include "amphora_api.def"
 #undef AMPHORA_VFUNCTION_V1
 #undef AMPHORA_FUNCTION_V1
 #undef AMPHORA_ROUTINE_V1
 
+	ast.version = AMPHORA_API_VERSION;
 	ast.StartEngine = Amphora_StartEngine;
 	ast.RegisterGameData = Amphora_RegisterGameData;
 	ast.RegisterWindowTitle = Amphora_RegisterWindowTitle;
@@ -28,7 +37,7 @@ Amphora_GetAPI(AmphoraAPI **api, AmphoraStartup **astart)
 	ast.RegisterMapData = Amphora_RegisterMapData;
 	ast.RegisterSFXData = Amphora_RegisterSFXData;
 	ast.RegisterMusicData = Amphora_RegisterMusicData;
+	ast.GetAPI = Amphora_GetAPI;
 
-	*api = &aapi;
-	*astart = &ast;
+	return &ast;
 }
