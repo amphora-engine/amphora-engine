@@ -130,6 +130,12 @@ Amphora_GetFPS(void)
 	return framerate;
 }
 
+Uint32
+Amphora_GetTicks(void)
+{
+	return SDL_GetTicks();
+}
+
 /*
  * Private functions
  */
