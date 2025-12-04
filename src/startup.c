@@ -1,3 +1,6 @@
+#include <stdio.h>
+#include <stdlib.h>
+
 #include "amphora.h"
 #include "amphora_api.h"
 
@@ -17,6 +20,8 @@ Amphora_GetAPI(int version)
 AmphoraStartup *
 Amphora_Connect(void)
 {
+	size_t version_string_len = strlen(ENGINE_SUFFIX) + strlen(VERSION_STRING) + 2;
+
 #define AMPHORA_VFUNCTION_V1(ret, name, sig_args, p_sig_args, call_args) aapi_v1.name = Amphora_##name
 #define AMPHORA_FUNCTION_V1(ret, name, sig_args, call_args) aapi_v1.name = Amphora_##name
 #define AMPHORA_ROUTINE_V1(name, sig_args, call_args) aapi_v1.name = Amphora_##name
@@ -25,7 +30,13 @@ Amphora_Connect(void)
 #undef AMPHORA_FUNCTION_V1
 #undef AMPHORA_ROUTINE_V1
 
-	ast.version = AMPHORA_API_VERSION;
+	ast.engine_version = malloc(version_string_len);
+	if (ast.engine_version == NULL)
+		(void)fputs("Failed to allocate memory for engine version string\n", stderr);
+	else
+		(void)snprintf(ast.engine_version, version_string_len, "%s-%s", ENGINE_SUFFIX, VERSION_STRING);
+
+	ast.api_version = AMPHORA_API_VERSION;
 	ast.StartEngine = Amphora_StartEngine;
 	ast.RegisterGameData = Amphora_RegisterGameData;
 	ast.RegisterWindowTitle = Amphora_RegisterWindowTitle;

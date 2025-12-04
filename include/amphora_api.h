@@ -21,7 +21,8 @@ extern void Amphora_RegisterMusicData(const char **, const char **, int);
 
 typedef struct
 {
-	int version;
+	char *engine_version;
+	int api_version;
 	int (*StartEngine)(void);
 	void (*RegisterGameData)(const char *, const char *);
 	void (*RegisterWindowTitle)(const char *);

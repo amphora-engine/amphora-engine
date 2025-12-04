@@ -10,13 +10,19 @@ if(APPLE)
     set(CMAKE_THREAD_LIBS_INIT "-lpthread")
 endif()
 
-set(AMPHORA_ENGINE_VERSION_STRING "v0.2.0-beta")
 set(AMPHORA_ENGINE_SUFFIX "vanilla")
+set(AMPHORA_ENGINE_VERSION_STRING "v0.2.0-alpha")
 
 project(amphora LANGUAGES C)
 
 set(CMAKE_C_STANDARD 17)
 
+add_compile_definitions(ENGINE_SUFFIX="${AMPHORA_ENGINE_SUFFIX}")
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+	add_compile_definitions(VERSION_STRING="${AMPHORA_ENGINE_VERSION_STRING}-dbg")
+else()
+	add_compile_definitions(VERSION_STRING="${AMPHORA_ENGINE_VERSION_STRING}")
+endif()
 if(WIN32)
 	string(APPEND CMAKE_C_FLAGS_DEBUG " /DDEBUG /W4 /WX")
 else()
