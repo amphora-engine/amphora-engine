@@ -20,6 +20,7 @@ add_library(amphora SHARED
 	particles.c
 	typewriter.c
 	memory.c
+	startup.c
 )
 
 target_link_libraries(amphora PRIVATE

@@ -1,14 +1,6 @@
 #ifndef AMPHORA_H
 #define AMPHORA_H
 
-#include "config.h"
-
-typedef struct input_state_t {
-#define KMAP(action, ...) bool action : 1;
-	DEFAULT_KEYMAP
-#undef KMAP
-} InputState;
-
 #include "collision.h"
 #include "db.h"
 #include "error.h"

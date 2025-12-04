@@ -1,0 +1,145 @@
+// Collision
+AMPHORA_FUNCTION_V1(bool, CheckCollision, (const void *obj1, const void *obj2), (obj1, obj2));
+AMPHORA_FUNCTION_V1(AmphoraCollision, CheckObjectGroupCollision, (const void *obj1, const char *name), (obj1, name));
+
+// Database
+AMPHORA_FUNCTION_V1(sqlite3 *, GetDB, (void), ());
+
+// Error
+AMPHORA_FUNCTION_V1(const char *, GetError, (void), ());
+AMPHORA_FUNCTION_V1(AmphoraStatusCode, GetErrorCode, (void), ());
+
+// Events
+AMPHORA_FUNCTION_V1(int, RegisterEvent, (const char *name, void (*func)(void)), (name, func));
+AMPHORA_FUNCTION_V1(int, UnregisterEvent, (const char *name), (name));
+
+// Image
+AMPHORA_FUNCTION_V1(Vector2f, GetSpritePosition, (const AmphoraImage *spr), (spr));
+AMPHORA_FUNCTION_V1(Vector2f, GetSpriteCenter, (const AmphoraImage *spr), (spr));
+AMPHORA_FUNCTION_V1(bool, IsSpriteFlipped, (const AmphoraImage *spr), (spr));
+AMPHORA_FUNCTION_V1(AmphoraImage *, CreateSprite, (const char *image_name, float x, float y, float scale, bool flip, bool stationary, Sint32 order),
+	(image_name, x, y, scale, flip, stationary, order));
+AMPHORA_FUNCTION_V1(int, AddFrameset, (AmphoraImage *spr, const char *name, const char *override_img, Sint32 sx, Sint32 sy,
+	Sint32 w, Sint32 h, float off_x, float off_y, Uint16 num_frames, Uint16 delay),
+	(spr, name, override_img, sx, sy, w, h, off_x, off_y, num_frames, delay));
+AMPHORA_ROUTINE_V1(SetFrameset, (AmphoraImage *spr, const char *name), (spr, name));
+AMPHORA_ROUTINE_V1(PlayOneshot, (AmphoraImage *spr, const char *name, void (*callback)(void)), (spr, name, callback));
+AMPHORA_FUNCTION_V1(int, SetFramesetAnimationTime, (AmphoraImage *spr, const char *name, Uint16 delay), (spr, name, delay));
+AMPHORA_FUNCTION_V1(AmphoraImage *, ReorderSprite, (AmphoraImage *spr, Sint32 order), (spr, order));
+AMPHORA_FUNCTION_V1(int, SetSpriteLocation, (AmphoraImage *spr, float x, float y), (spr, x, y));
+AMPHORA_FUNCTION_V1(int, MoveSprite, (AmphoraImage *spr, float delta_x, float delta_y), (spr, delta_x, delta_y));
+AMPHORA_FUNCTION_V1(int, FlipSprite, (AmphoraImage *spr), (spr));
+AMPHORA_FUNCTION_V1(int, UnflipSprite, (AmphoraImage *spr), (spr));
+AMPHORA_FUNCTION_V1(int, ShowSprite, (AmphoraImage *spr), (spr));
+AMPHORA_FUNCTION_V1(int, HideSprite, (AmphoraImage *spr), (spr));
+AMPHORA_ROUTINE_V1(ApplyFXToImage, (AmphoraImage *img, void (*fx)(SDL_Surface *)), (img, fx));
+AMPHORA_ROUTINE_V1(ResetImage, (AmphoraImage *img), (img));
+AMPHORA_FUNCTION_V1(int, FreeSprite, (AmphoraImage *spr), (spr));
+
+// Input
+AMPHORA_ROUTINE_V1(LoadKeymap, (void), ());
+AMPHORA_FUNCTION_V1(int, UpdateKeymap, (const char *action, SDL_Keycode keycode), (action, keycode));
+AMPHORA_FUNCTION_V1(bool, ObjectClicked, (void *spr, int button, void (*callback)(void)), (spr, button, callback));
+AMPHORA_FUNCTION_V1(bool, ObjectHover, (void *obj), (obj));
+AMPHORA_FUNCTION_V1(SDL_Keycode, GetPressedKey, (void), ());
+AMPHORA_FUNCTION_V1(bool, LeftJoystickActive, (void), ());
+AMPHORA_FUNCTION_V1(bool, RightJoystickActive, (void), ());
+AMPHORA_FUNCTION_V1(Vector2f, GetLeftJoystickState, (void), ());
+AMPHORA_FUNCTION_V1(Vector2f, GetRightJoystickState, (void), ());
+AMPHORA_FUNCTION_V1(const char *, GetActionKeyName, (const char *action), (action));
+AMPHORA_ROUTINE_V1(ForEachAction, (void (*callback)(const char *, int)), (callback));
+
+// Memory
+AMPHORA_FUNCTION_V1(int, HeapPtrToBlkIdx, (void *ptr, int *blk, int *idx), (ptr, blk, idx));
+AMPHORA_FUNCTION_V1(void *, HeapBlkIdxToPtr, (int blk, int idx), (blk, idx));
+AMPHORA_ROUTINE_V1(HeapDumpBlock, (uint8_t blk), (blk));
+AMPHORA_FUNCTION_V1(uint8_t, HeapPeek, (uint8_t blk, uint16_t idx), (blk, idx));
+AMPHORA_ROUTINE_V1(HeapPoke, (uint8_t blk, uint16_t idx, uint8_t val), (blk, idx, val));
+
+// Mixer
+AMPHORA_ROUTINE_V1(PlaySFX, (const char *name, int channel, int repeat), (name, channel, repeat));
+AMPHORA_ROUTINE_V1(SetSFXVolume, (const char *name, int volume), (name, volume));
+AMPHORA_ROUTINE_V1(SetMusic, (const char *name), (name));
+AMPHORA_ROUTINE_V1(PlayMusic, (int ms), (ms));
+AMPHORA_ROUTINE_V1(PlayMusicN, (int n, int ms), (n, ms));
+AMPHORA_ROUTINE_V1(PauseMusic, (void), ());
+AMPHORA_ROUTINE_V1(UnpauseMusic, (void), ());
+AMPHORA_ROUTINE_V1(StopMusic, (void), ());
+AMPHORA_ROUTINE_V1(FadeOutMusic, (int ms), (ms));
+
+// Particles
+AMPHORA_FUNCTION_V1(AmphoraEmitter *, CreateEmitter, (float x, float y, float w, float h, float start_x, float start_y,
+	int spread_x, int spread_y, int count, float p_w, float p_h, SDL_Color color, bool stationary, Sint32 order,
+	void (*update_fn)(int, int, AmphoraParticle *, AmphoraParticleExt *, const SDL_FRect *)),
+	(x, y, w, h, start_x, start_y, spread_x, spread_y, count, p_w, p_h, color, stationary, order, update_fn));
+AMPHORA_FUNCTION_V1(int, DestroyEmitter, (AmphoraEmitter *emitter), (emitter));
+
+// Random
+AMPHORA_FUNCTION_V1(Uint16, GetRandom, (Uint16 n), (n));
+AMPHORA_FUNCTION_V1(float, GetRandomF, (void), ());
+
+// Render
+AMPHORA_FUNCTION_V1(Vector2, GetResolution, (void), ());
+AMPHORA_FUNCTION_V1(Vector2, GetRenderLogicalSize, (void), ());
+AMPHORA_FUNCTION_V1(Vector2f, GetCamera, (void), ());
+AMPHORA_ROUTINE_V1(SetCamera, (float x, float y), (x, y));
+AMPHORA_ROUTINE_V1(MoveCamera, (float delta_x, float delta_y), (delta_x, delta_y));
+AMPHORA_ROUTINE_V1(SetCameraTarget, (AmphoraImage *target), (target));
+AMPHORA_ROUTINE_V1(BoundCameraToMap, (void), ());
+AMPHORA_ROUTINE_V1(BoundCamera, (const SDL_FRect *boundary), (boundary));
+AMPHORA_ROUTINE_V1(UnboundCamera, (void), ());
+AMPHORA_ROUTINE_V1(SetCameraZoom, (Uint16 factor, Uint16 delay), (factor, delay));
+AMPHORA_ROUTINE_V1(ResetCameraZoom, (Uint16 delay), (delay));
+AMPHORA_FUNCTION_V1(SDL_Color, GetBGColor, (void), ());
+AMPHORA_ROUTINE_V1(SetBGColor, (SDL_Color color), (color));
+AMPHORA_ROUTINE_V1(SetWindowFullscreen, (void), ());
+AMPHORA_ROUTINE_V1(SetWindowWindowed, (void), ());
+AMPHORA_FUNCTION_V1(bool, IsWindowFullscreen, (void), ());
+
+// Save Data
+AMPHORA_FUNCTION_V1(int, SaveNumber, (const char *attribute, double value), (attribute, value));
+AMPHORA_FUNCTION_V1(int, SaveString, (const char *attribute, const char *value), (attribute, value));
+AMPHORA_FUNCTION_V1(double, LoadNumber, (const char *attribute, double default_value), (attribute, default_value));
+AMPHORA_FUNCTION_V1(int, LoadString, (const char *attribute, char **out_string), (attribute, out_string));
+
+// Scenes
+AMPHORA_FUNCTION_V1(int, LoadScene, (const char *name), (name));
+AMPHORA_FUNCTION_V1(int, SetSceneFadeParameters, (Uint16 ms, SDL_Color color), (ms, color));
+
+// Session Data
+AMPHORA_FUNCTION_V1(long, GetSessionData, (const char *key), (key));
+AMPHORA_FUNCTION_V1(void, StoreSessionData, (const char *key, long val), (key, val));
+AMPHORA_FUNCTION_V1(void, DeleteSessionData, (const char *key), (key));
+
+// Tilemap
+AMPHORA_ROUTINE_V1(SetMap, (const char *name, float scale), (name, scale));
+AMPHORA_FUNCTION_V1(const SDL_FRect *, GetMapRectangle, (void), ());
+AMPHORA_FUNCTION_V1(int, HideMapLayer, (const char *name, int t), (name, t));
+AMPHORA_FUNCTION_V1(int, ShowMapLayer, (const char *name, int t), (name, t));
+
+// Fonts
+AMPHORA_VFUNCTION_V1(AmphoraString *, CreateString,
+	(const char *font_name, int pt, float x, float y, int order, SDL_Color color, bool stationary, const char *fmt, ...),
+	(const char *font_name, int pt, float x, float y, int order, SDL_Color color, bool stationary, const char *fmt, va_list args),
+	(font_name, pt, x, y, order, color, stationary, fmt, args));
+AMPHORA_FUNCTION_V1(size_t, GetStringLength, (const AmphoraString *msg), (msg));
+AMPHORA_FUNCTION_V1(size_t, GetNumCharactersDisplayed, (const AmphoraString *msg), (msg));
+AMPHORA_FUNCTION_V1(const char *, GetStringText, (AmphoraString *msg), (msg));
+AMPHORA_FUNCTION_V1(char, GetStringCharAtIndex, (const AmphoraString *msg, int idx), (msg, idx));
+AMPHORA_VFUNCTION_V1(AmphoraString *, UpdateStringText,
+	(AmphoraString *msg, const char *fmt, ...),
+	(AmphoraString *msg, const char *fmt, va_list args),
+	(msg, fmt, args));
+AMPHORA_FUNCTION_V1(AmphoraString *, UpdateStringCharsDisplayed, (AmphoraString *msg, size_t n), (msg, n));
+AMPHORA_ROUTINE_V1(FreeString, (AmphoraString *msg), (msg));
+AMPHORA_ROUTINE_V1(RenderString, (const AmphoraString *msg), (msg));
+
+// Typewriter
+AMPHORA_FUNCTION_V1(TypewriterStatus, TypeString, (AmphoraString *string, Uint32 ms, void (*callback)(int, char)), (string, ms, callback));
+AMPHORA_FUNCTION_V1(TypewriterStatus, SetStringTypeSpeed, (AmphoraString *string, Uint32 ms), (string, ms));
+
+// Utilities
+AMPHORA_ROUTINE_V1(QuitGame, (void), ());
+AMPHORA_FUNCTION_V1(Uint32, GetFrame, (void), ());
+AMPHORA_FUNCTION_V1(Uint32, GetFPS, (void), ());
+AMPHORA_FUNCTION_V1(Uint32, GetTicks, (void), ());
