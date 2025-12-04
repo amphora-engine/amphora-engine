@@ -19,10 +19,8 @@ set(CMAKE_C_STANDARD 17)
 
 if(WIN32)
 	string(APPEND CMAKE_C_FLAGS_DEBUG " /DDEBUG /W4 /WX")
-	string(APPEND CMAKE_CXX_FLAGS_DEBUG " /DDEBUG /W4 /WX")
 else()
 	string(APPEND CMAKE_C_FLAGS_DEBUG " -DDEBUG -fsanitize=address,undefined -Werror=all -Werror=pedantic -Wextra")
-	string(APPEND CMAKE_CXX_FLAGS_DEBUG " -DDEBUG -fsanitize=address,undefined -Wall -Wextra")
 endif()
 
 find_package(SDL2 CONFIG REQUIRED)
