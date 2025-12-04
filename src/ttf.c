@@ -17,13 +17,12 @@ static const char **font_paths;
 static int font_count;
 
 AmphoraString *
-Amphora_CreateString(const char *font_name, const int pt, const float x, const float y, const int order, const SDL_Color color, const bool stationary, const char *fmt, ...)
+Amphora_CreateString(const char *font_name, const int pt, const float x, const float y, const int order, const SDL_Color color, const bool stationary, const char *fmt, va_list args)
 {
 	struct render_list_node_t *render_list_node = Amphora_AddRenderListNode(order);
 	struct amphora_message_t *msg;
 	SDL_RWops *font_rw;
 	char text[AMPHORA_MAX_STR_LEN];
-	va_list args;
 
 	if (HT_GetValue(font_name, fonts) == -1)
 	{
@@ -38,7 +37,6 @@ Amphora_CreateString(const char *font_name, const int pt, const float x, const f
 		font_rw = SDL_RWFromFile(HT_GetRef(font_name, char, fonts), "rb");
 		HT_StoreRef(font_name, TTF_OpenFontRW(font_rw, 1, 16), open_fonts);
 	}
-	va_start(args, fmt);
 	(void)SDL_vsnprintf(text, sizeof(text), fmt, args);
 
 	/* TODO: cleanup on fail */
@@ -93,12 +91,10 @@ Amphora_GetStringCharAtIndex(const AmphoraString *msg, int idx)
 }
 
 AmphoraString *
-Amphora_UpdateStringText(AmphoraString *msg, const char *fmt, ...)
+Amphora_UpdateStringText(AmphoraString *msg, const char *fmt, va_list args)
 {
-	va_list args;
 	char text[4096];
 
-	va_start(args, fmt);
 	(void)SDL_vsnprintf(text, 4096, fmt, args);
 
 	msg->len = SDL_strlen(text);

@@ -11,7 +11,7 @@
 extern "C" {
 #endif
 /* Create a string */
-AmphoraString *Amphora_CreateString(const char *font_name, int pt, float x, float y, int order, SDL_Color color, bool stationary, const char *fmt, ...);
+AmphoraString *Amphora_CreateString(const char *font_name, int pt, float x, float y, int order, SDL_Color color, bool stationary, const char *fmt, va_list args);
 /* Get the number of characters in a message */
 size_t Amphora_GetStringLength(const AmphoraString *msg);
 /* Get the number of characters currently displayed in a message */
@@ -21,7 +21,7 @@ const char *Amphora_GetStringText(AmphoraString *msg);
 /* Get the character at a specified string index */
 char Amphora_GetStringCharAtIndex(const AmphoraString *msg, int idx);
 /* Update the text in a string */
-AmphoraString *Amphora_UpdateStringText(AmphoraString *msg, const char *fmt, ...);
+AmphoraString *Amphora_UpdateStringText(AmphoraString *msg, const char *fmt, va_list args);
 /* Change the number of characters displayed in a string, 0 displays all characters */
 AmphoraString *Amphora_UpdateStringCharsDisplayed(AmphoraString *msg, size_t n);
 /* Free a string */
