@@ -17,7 +17,7 @@ size_t Amphora_GetStringLength(const AmphoraString *msg);
 /* Get the number of characters currently displayed in a message */
 size_t Amphora_GetNumCharactersDisplayed(const AmphoraString *msg);
 /* Get the text of an AmphoraString */
-const char *Ampohra_GetStringText(AmphoraString *msg);
+const char *Amphora_GetStringText(AmphoraString *msg);
 /* Get the character at a specified string index */
 char Amphora_GetStringCharAtIndex(const AmphoraString *msg, int idx);
 /* Update the text in a string */

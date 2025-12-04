@@ -81,7 +81,7 @@ Amphora_GetNumCharactersDisplayed(const AmphoraString *msg)
 }
 
 const char *
-Ampohra_GetStringText(AmphoraString *msg)
+Amphora_GetStringText(AmphoraString *msg)
 {
 	return msg->text;
 }
