@@ -2,7 +2,6 @@
 #define AMPHORA_H
 
 #include "collision.h"
-#include "db.h"
 #include "error.h"
 #include "events.h"
 #include "img.h"

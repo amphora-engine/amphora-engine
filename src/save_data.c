@@ -2,6 +2,8 @@
 #include "internal/memory.h"
 #include "internal/save_data.h"
 
+#include "SDL.h"
+
 int
 Amphora_SaveNumber(const char *attribute, double value)
 {

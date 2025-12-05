@@ -2,9 +2,6 @@
 AMPHORA_FUNCTION_V1(bool, CheckCollision, (const void *obj1, const void *obj2), (obj1, obj2));
 AMPHORA_FUNCTION_V1(AmphoraCollision, CheckObjectGroupCollision, (const void *obj1, const char *name), (obj1, name));
 
-// Database
-AMPHORA_FUNCTION_V1(sqlite3 *, GetDB, (void), ());
-
 // Error
 AMPHORA_FUNCTION_V1(const char *, GetError, (void), ());
 AMPHORA_FUNCTION_V1(AmphoraStatusCode, GetErrorCode, (void), ());

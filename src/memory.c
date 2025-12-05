@@ -1,4 +1,3 @@
-#include <stdint.h>
 #if defined(__APPLE__) || defined(__linux__)
 #include <fcntl.h>
 #include <unistd.h>

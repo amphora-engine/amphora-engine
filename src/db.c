@@ -7,15 +7,15 @@ static sqlite3 *game_db;
 static const char *game_author;
 static const char *game_title;
 
+/*
+ * Internal functions
+ */
+
 sqlite3 *
 Amphora_GetDB(void)
 {
 	return game_db;
 }
-
-/*
- * Internal functions
- */
 
 int
 Amphora_InitDB(void)
