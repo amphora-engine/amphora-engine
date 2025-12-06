@@ -12,7 +12,6 @@
 #define fixed SDL_WINDOW_SHOWN
 #define resizable SDL_WINDOW_RESIZABLE
 
-#ifndef __cplusplus
 #ifndef bool
 #define bool SDL_bool
 #endif
@@ -22,15 +21,14 @@
 #ifndef false
 #define false SDL_FALSE
 #endif
-#endif
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 void Amphora_QuitGame(void); /* Request to quit the game */
-Uint32 Amphora_GetFrame(void); /* Get the current running framerate */
-Uint32 Amphora_GetFPS(void); /* Get the current running framerate */
-Uint32 Amphora_GetTicks(void); /* Get the current running time in milliseconds */
+unsigned int Amphora_GetFrame(void); /* Get the current running framerate */
+int Amphora_GetFPS(void); /* Get the current running framerate */
+unsigned int Amphora_GetTicks(void); /* Get the current running time in milliseconds */
 #ifdef __cplusplus
 }
 #endif

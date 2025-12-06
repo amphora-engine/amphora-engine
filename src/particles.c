@@ -22,14 +22,15 @@ Amphora_CreateEmitter(float x,
 			int count,
 			float p_w,
 			float p_h,
-			SDL_Color color,
+			AmphoraColor color,
 			bool stationary,
-			Sint32 order,
-			void (*update_fn)(int, int, AmphoraParticle *, AmphoraParticleExt *, const SDL_FRect *))
+			int order,
+			void (*update_fn)(int, int, AmphoraParticle *, AmphoraParticleExt *, const AmphoraFRect *))
 {
 	AmphoraEmitter *emitter = NULL;
 	struct render_list_node_t *render_list_node = NULL;
 	SDL_FPoint position;
+	SDL_Color initial_color = { color.r, color.g, color.b, color.a };
 	int i;
 
 	if ((emitter = Amphora_HeapAlloc(sizeof(AmphoraEmitter), MEM_EMITTER)) == NULL)
@@ -46,7 +47,7 @@ Amphora_CreateEmitter(float x,
 		Amphora_SetError(AMPHORA_STATUS_ALLOC_FAIL, "Failed to create emitter texture");
 		goto fail_texture;
 	}
-	emitter->rectangle = (SDL_FRect) { x, y, w, h };
+	emitter->rectangle = (AmphoraFRect) { x, y, w, h };
 	if (!((emitter->particles = Amphora_HeapAlloc(count * sizeof(AmphoraParticle), MEM_EMITTER))))
 	{
 		Amphora_SetError(AMPHORA_STATUS_ALLOC_FAIL, "Failed to allocate particles");
@@ -58,7 +59,7 @@ Amphora_CreateEmitter(float x,
 		goto fail_data;
 	}
 	emitter->particles_count = count;
-	emitter->initial_color = color;
+	emitter->initial_color = initial_color;
 	emitter->start_position = (SDL_FPoint) { start_x, start_y };
 	emitter->spread_x = spread_x;
 	emitter->spread_y = spread_y;
@@ -77,7 +78,7 @@ Amphora_CreateEmitter(float x,
 		emitter->particles[i].y = position.y;
 		emitter->particles[i].w = p_w;
 		emitter->particles[i].h = p_h;
-		emitter->particles[i].color = color;
+		emitter->particles[i].color = initial_color;
 		emitter->particle_data[i].data1 = 0;
 		emitter->particle_data[i].data2 = 0;
 		emitter->particle_data[i].data3 = 0;
@@ -121,6 +122,7 @@ Amphora_UpdateAndRenderParticleEmitter(AmphoraEmitter *emitter)
 	SDL_Renderer *renderer = Amphora_GetRenderer();
 	SDL_Color color = { 0, 0, 0, 0 };
 	SDL_FRect dst;
+	SDL_FRect target;
 	Camera camera = Amphora_GetCamera();
 	int i;
 
@@ -157,7 +159,11 @@ Amphora_UpdateAndRenderParticleEmitter(AmphoraEmitter *emitter)
 		(void)SDL_RenderFillRectF(renderer, &dst);
 	}
 	(void)SDL_SetRenderTarget(renderer, NULL);
-	Amphora_RenderTexture(emitter->texture, NULL, &emitter->rectangle, 0, SDL_FLIP_NONE);
+	target.x = emitter->rectangle.x;
+	target.y = emitter->rectangle.y;
+	target.w = emitter->rectangle.w;
+	target.h = emitter->rectangle.h;
+	Amphora_RenderTexture(emitter->texture, NULL, &target, 0, SDL_FLIP_NONE);
 }
 
 /*

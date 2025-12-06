@@ -10,13 +10,14 @@ static struct amphora_typewriter_t typewriters[MAX_CONCURRENT_TYPEWRITERS];
 static unsigned int typewriters_count;
 
 TypewriterStatus
-Amphora_TypeString(AmphoraString *string, Uint32 ms, void (*callback)(int, char))
+Amphora_TypeString(AmphoraString *string, int ms, void (*callback)(int, char))
 {
 	int i;
 
 	if (!string) return TYPEWRITER_NOSTRING;
 	if (Amphora_GetStringLength(string) == Amphora_GetNumCharactersDisplayed(string))
 		return TYPEWRITER_DONE;
+	if (ms <= 0) return TYPEWRITER_ERROR;
 
 	for (i = 0; i < MAX_CONCURRENT_TYPEWRITERS; i++)
 	{
@@ -59,12 +60,13 @@ Amphora_TypeString(AmphoraString *string, Uint32 ms, void (*callback)(int, char)
 }
 
 TypewriterStatus
-Amphora_SetStringTypeSpeed(AmphoraString *string, Uint32 ms)
+Amphora_SetStringTypeSpeed(AmphoraString *string, int ms)
 {
 	int i;
 
 	if (!string) return TYPEWRITER_NOSTRING;
 	if (Amphora_GetStringLength(string) == Amphora_GetNumCharactersDisplayed(string)) return TYPEWRITER_DONE;
+	if (ms <= 0) return TYPEWRITER_ERROR;
 
 	for (i = 0; i < MAX_CONCURRENT_TYPEWRITERS; i++)
 	{

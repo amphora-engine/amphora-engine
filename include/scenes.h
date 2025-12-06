@@ -7,7 +7,7 @@
 extern "C" {
 #endif
 int Amphora_LoadScene(const char *name);
-int Amphora_SetSceneFadeParameters(Uint16 ms, SDL_Color color);
+int Amphora_SetSceneFadeParameters(int ms, AmphoraColor color);
 #ifdef __cplusplus
 }
 #endif

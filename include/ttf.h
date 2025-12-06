@@ -11,7 +11,7 @@
 extern "C" {
 #endif
 /* Create a string */
-AmphoraString *Amphora_CreateString(const char *font_name, int pt, float x, float y, int order, SDL_Color color, bool stationary, const char *fmt, va_list args);
+AmphoraString *Amphora_CreateString(const char *font_name, int pt, float x, float y, int order, AmphoraColor color, bool stationary, const char *fmt, va_list args);
 /* Get the number of characters in a message */
 size_t Amphora_GetStringLength(const AmphoraString *msg);
 /* Get the number of characters currently displayed in a message */

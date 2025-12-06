@@ -393,7 +393,7 @@ Amphora_ProcessJoystickState(SDL_GameControllerAxis ax, SDL_GameControllerAxis a
  */
 
 void
-Amphora_RegisterActionData(Uint32 *key_state, const char **actions, SDL_Keycode *keyboard_names, SDL_GameControllerButton *gamepad_buttons, const char **gamepad_button_names, int count)
+Amphora_RegisterActionData(unsigned int *key_state, const char **actions, SDL_Keycode *keyboard_names, SDL_GameControllerButton *gamepad_buttons, const char **gamepad_button_names, int count)
 {
 	key_actions = key_state;
 	action_names = actions;

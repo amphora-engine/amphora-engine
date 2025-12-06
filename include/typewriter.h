@@ -16,8 +16,8 @@ typedef enum {
 #ifdef __cplusplus
 extern "C" {
 #endif
-TypewriterStatus Amphora_TypeString(AmphoraString *string, Uint32 ms, void (*callback)(int, char));
-TypewriterStatus Amphora_SetStringTypeSpeed(AmphoraString *string, Uint32 ms);
+TypewriterStatus Amphora_TypeString(AmphoraString *string, int ms, void (*callback)(int, char));
+TypewriterStatus Amphora_SetStringTypeSpeed(AmphoraString *string, int ms);
 #ifdef __cplusplus
 }
 #endif

@@ -22,7 +22,7 @@ static int scenes_count;
 static long current_scene_idx = 0;
 static int current_scene_name = 0;
 static AmphoraFader transition_fader;
-static SDL_Color fade_color = { 255, 255, 255, 255 };
+static SDL_Color fade_color = { 0, 0, 0, 255 };
 static SDL_Rect fade_rect;
 static bool scene_update_lock = false;
 
@@ -67,10 +67,12 @@ Amphora_LoadScene(const char *name)
 }
 
 int
-Amphora_SetSceneFadeParameters(Uint16 ms, SDL_Color color)
+Amphora_SetSceneFadeParameters(int ms, AmphoraColor color)
 {
 	transition_fader.timer = ms;
-	fade_color = color;
+	fade_color.r = color.r;
+	fade_color.g = color.g;
+	fade_color.b = color.b;
 
 	return AMPHORA_STATUS_OK;
 }
@@ -105,7 +107,7 @@ Amphora_InitScene(void)
 }
 
 void
-Amphora_UpdateScene(Uint32 frame_count)
+Amphora_UpdateScene(unsigned int frame_count)
 {
 	scene_structs[current_scene_idx].update_func(frame_count, Amphora_GetKeyActionState());
 }

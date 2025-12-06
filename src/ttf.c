@@ -17,11 +17,12 @@ static const char **font_paths;
 static int font_count;
 
 AmphoraString *
-Amphora_CreateString(const char *font_name, const int pt, const float x, const float y, const int order, const SDL_Color color, const bool stationary, const char *fmt, va_list args)
+Amphora_CreateString(const char *font_name, const int pt, const float x, const float y, const int order, const AmphoraColor color, const bool stationary, const char *fmt, va_list args)
 {
 	struct render_list_node_t *render_list_node = Amphora_AddRenderListNode(order);
 	struct amphora_message_t *msg;
 	SDL_RWops *font_rw;
+	SDL_Color initial_color = { color.r, color.g, color.b, color.a };
 	char text[AMPHORA_MAX_STR_LEN];
 
 	if (HT_GetValue(font_name, fonts) == -1)
@@ -52,7 +53,7 @@ Amphora_CreateString(const char *font_name, const int pt, const float x, const f
 	msg->pt = pt;
 	msg->len = SDL_strlen(text);
 	msg->n = 0;
-	msg->color = color;
+	msg->color = initial_color;
 	msg->rectangle.x = x;
 	msg->rectangle.y = y;
 	msg->render_list_node = render_list_node;

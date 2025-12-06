@@ -68,13 +68,18 @@ Amphora_SetCameraTarget(AmphoraImage *target)
 void
 Amphora_BoundCameraToMap(void)
 {
-	SDL_memcpy(&camera_boundary, Amphora_GetMapRectangle(), sizeof(camera_boundary));
+	AmphoraFRect map_rect = *Amphora_GetMapRectangle();
+	SDL_FRect rect = { map_rect.x, map_rect.y, map_rect.w, map_rect.h };
+
+	SDL_memcpy(&camera_boundary, &rect, sizeof(camera_boundary));
 }
 
 void
-Amphora_BoundCamera(const SDL_FRect *boundary)
+Amphora_BoundCamera(const AmphoraFRect *boundary)
 {
-	SDL_memcpy(&camera_boundary, boundary, sizeof(camera_boundary));
+	SDL_FRect rect = { boundary->x, boundary->y, boundary->w, boundary->h };
+
+	SDL_memcpy(&camera_boundary, &rect, sizeof(camera_boundary));
 }
 
 void
@@ -84,12 +89,12 @@ Amphora_UnboundCamera(void)
 }
 
 void
-Amphora_SetCameraZoom(Uint16 factor, Uint16 delay)
+Amphora_SetCameraZoom(int factor, int delay)
 {
-	static Uint16 current_factor = 100;
+	static int current_factor = 100;
 	static Vector2 *scale_steps = NULL;
-	static Uint16 scale_steps_index = 0;
-	static Uint16 scale_steps_count = 0;
+	static int scale_steps_index = 0;
+	static int scale_steps_count = 0;
 	Vector2 current_resolution = Amphora_GetResolution();
 	Vector2 current_logical_size = Amphora_GetRenderLogicalSize();
 	int i;
@@ -97,6 +102,9 @@ Amphora_SetCameraZoom(Uint16 factor, Uint16 delay)
 		.x = (current_logical_size.x - ((current_resolution.x * 100) / factor)) / (delay ? delay : 1),
 		.y = (current_logical_size.y - ((current_resolution.y * 100) / factor)) / (delay ? delay : 1)
 	};
+
+	if (factor <= 0) return;
+	if (delay < 0) delay = 0;
 
 	if (!scale_steps && delay > 0)
 	{
@@ -134,21 +142,26 @@ Amphora_SetCameraZoom(Uint16 factor, Uint16 delay)
 }
 
 void
-Amphora_ResetCameraZoom(Uint16 delay)
+Amphora_ResetCameraZoom(int delay)
 {
 	Amphora_SetCameraZoom(100, delay);
 }
 
-SDL_Color
+AmphoraColor
 Amphora_GetBGColor(void)
 {
-	return bg;
+	AmphoraColor abg = { .r = bg.r, .g = bg.g, .b = bg.b, .a = bg.a};
+
+	return abg;
 }
 
 void
-Amphora_SetBGColor(SDL_Color color)
+Amphora_SetBGColor(AmphoraColor color)
 {
-	bg = color;
+	bg.r = color.r;
+	bg.g = color.g;
+	bg.b = color.b;
+	bg.a = 0xff;
 }
 
 void
@@ -280,7 +293,8 @@ void
 Amphora_ProcessRenderList(void)
 {
 	struct render_list_node_t *garbage;
-	SDL_FRect map_rect;
+	AmphoraFRect map_rect;
+	SDL_FRect rect;
 
 	while(render_list)
 	{
@@ -308,7 +322,8 @@ Amphora_ProcessRenderList(void)
 				map_rect = *Amphora_GetMapRectangle();
 				map_rect.x = -camera.x;
 				map_rect.y = -camera.y;
-				Amphora_RenderTexture(render_list->data, NULL, &map_rect, 0,
+				rect = (SDL_FRect){ map_rect.x, map_rect.y, map_rect.w, map_rect.h };
+				Amphora_RenderTexture(render_list->data, NULL, &rect, 0,
 						      SDL_FLIP_NONE);
 				break;
 			case AMPH_OBJ_EMITTER:

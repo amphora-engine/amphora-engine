@@ -50,7 +50,7 @@ Amphora_CreateSprite(const char *image_name,
 			const float scale,
 			const bool flip,
 			const bool stationary,
-			const Sint32 order)
+			const int order)
 {
 	AmphoraImage *spr = NULL;
 	struct render_list_node_t *render_list_node = NULL;
@@ -87,18 +87,21 @@ int
 Amphora_AddFrameset(AmphoraImage *spr,
 			const char *name,
 			const char *override_img,
-			Sint32 sx,
-			Sint32 sy,
-			Sint32 w,
-			Sint32 h,
+			int sx,
+			int sy,
+			int w,
+			int h,
 			float off_x,
 			float off_y,
-			Uint16 num_frames,
-			Uint16 delay)
+			int num_frames,
+			int delay)
 {
 	SDL_Texture *override = NULL;
 
 	Amphora_ValidatePtrNotNull(spr, AMPHORA_STATUS_FAIL_UNDEFINED)
+	if (num_frames < 1) num_frames = 1;
+	if (delay < 1) delay = 1;
+
 	if (!((spr->frameset_list = Amphora_HeapRealloc(spr->frameset_list, (spr->num_framesets + 1) * sizeof(struct frameset_t), MEM_IMAGE))))
 	{
 		Amphora_SetError(AMPHORA_STATUS_ALLOC_FAIL, "Failed to reallocate framesets\n");
@@ -168,7 +171,7 @@ Amphora_PlayOneshot(AmphoraImage *spr, const char *name, void (*callback)(void))
 }
 
 int
-Amphora_SetFramesetAnimationTime(AmphoraImage *spr, const char *name, Uint16 delay)
+Amphora_SetFramesetAnimationTime(AmphoraImage *spr, const char *name, unsigned int delay)
 {
 	struct frameset_t *frameset = &spr->frameset_list[HT_GetValue(name, spr->framesets)];
 
@@ -180,7 +183,7 @@ Amphora_SetFramesetAnimationTime(AmphoraImage *spr, const char *name, Uint16 del
 }
 
 AmphoraImage *
-Amphora_ReorderSprite(AmphoraImage *spr, Sint32 order)
+Amphora_ReorderSprite(AmphoraImage *spr, int order)
 {
 	struct render_list_node_t *new_node = Amphora_AddRenderListNode(order);
 	struct render_list_node_t *old_node = spr->render_list_node;
@@ -265,11 +268,16 @@ Amphora_HideSprite(AmphoraImage *spr)
 }
 
 void
-Amphora_ApplyFXToImage(AmphoraImage *img, void (*fx)(SDL_Surface *))
+Amphora_ApplyFXToImage(AmphoraImage *img, void (*fx)(AmphoraSurface *))
 {
+	AmphoraSurface surface;
+
 	if (!fx) return;
 
-	fx(img->surface);
+	surface.pixels = img->surface->pixels;
+	surface.w = img->surface->w;
+	surface.h = img->surface->h;
+	fx(&surface);
 	img->rerender = true;
 }
 

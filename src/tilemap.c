@@ -30,7 +30,7 @@ static struct
 	bool persist_shown : 1;
 } tilemap_flags;
 static struct amphora_tilemap_layer_t *fade_layer;
-static SDL_FRect map_rect;
+static AmphoraFRect map_rect;
 static struct amphora_object_groups_t obj_groups;
 
 void
@@ -57,7 +57,7 @@ Amphora_SetMap(const char *name, const float scale)
 	}
 }
 
-const SDL_FRect *
+const AmphoraFRect *
 Amphora_GetMapRectangle(void)
 {
 	return &map_rect;

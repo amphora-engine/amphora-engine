@@ -4,13 +4,16 @@
 
 static Uint32 rand_state;
 
-Uint16
-Amphora_GetRandom(Uint16 n)
+int
+Amphora_GetRandom(int n)
 {
-	rand_state ^= (rand_state << 13);
-	rand_state ^= (rand_state >> 17);
-	rand_state ^= (rand_state << 5);
-	return ((rand_state >> 16) * n) >> 16;
+	if (n > UINT16_MAX) n = UINT16_MAX;
+	if (n <= 0) return 0;
+
+	rand_state ^= rand_state << 13;
+	rand_state ^= rand_state >> 17;
+	rand_state ^= rand_state << 5;
+	return (int)((rand_state >> 16) * n) >> 16;
 }
 
 float

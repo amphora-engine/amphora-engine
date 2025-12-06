@@ -8,7 +8,7 @@
 
 struct emitter_t {
 	enum amphora_object_type_e type;
-	SDL_FRect rectangle;
+	AmphoraFRect rectangle;
 	SDL_Texture *texture;
 	AmphoraParticle *particles;
 	AmphoraParticleExt *particle_data;
@@ -16,7 +16,7 @@ struct emitter_t {
 	SDL_Color initial_color;
 	SDL_FPoint start_position;
 	int spread_x, spread_y;
-	void (*update)(int, int, AmphoraParticle *, AmphoraParticleExt *, const SDL_FRect *);
+	void (*update)(int, int, AmphoraParticle *, AmphoraParticleExt *, const AmphoraFRect *);
 	struct render_list_node_t *render_list_node;
 };
 

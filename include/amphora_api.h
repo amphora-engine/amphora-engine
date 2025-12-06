@@ -11,7 +11,7 @@ extern int Amphora_StartEngine(void);
 extern void Amphora_RegisterGameData(const char *, const char *);
 extern void Amphora_RegisterWindowTitle(const char *);
 extern void Amphora_RegisterPrefs(const char *, const char *, int, int, unsigned int, int);
-extern void Amphora_RegisterActionData(Uint32 *, const char **, SDL_Keycode *, SDL_GameControllerButton *, const char **, int);
+extern void Amphora_RegisterActionData(unsigned int *, const char **, SDL_Keycode *, SDL_GameControllerButton *, const char **, int);
 extern void Amphora_RegisterSceneData(const AmphoraScene *, const char **, int);
 extern void Amphora_RegisterImageData(const char **, const char **, int);
 extern void Amphora_RegisterFontData(const char **, const char **, int);

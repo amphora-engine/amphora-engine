@@ -12,10 +12,27 @@ typedef struct sprite_t AmphoraImage;
 typedef struct amphora_message_t AmphoraString;
 typedef struct emitter_t AmphoraEmitter;
 
-typedef union amphora_pixeldata_abgr_u {
-	SDL_Color color_data;
+typedef struct amphora_frect_t
+{
+	float x, y, w, h;
+} AmphoraFRect;
+
+typedef struct amphora_color_t
+{
+	uint8_t r, g, b, a;
+} AmphoraColor;
+
+typedef union amphora_pixeldata_abgr_u
+{
+	AmphoraColor color_data;
 	Uint32 pixel;
 } AmphoraPixelDataABGR;
+
+typedef struct amphora_surface_t
+{
+	AmphoraPixelDataABGR *pixels;
+	int w, h;
+} AmphoraSurface;
 
 #ifdef __cplusplus
 extern "C" {
@@ -35,17 +52,17 @@ void Amphora_SetCameraTarget(AmphoraImage *target);
 /* Bound the camera to the current map area */
 void Amphora_BoundCameraToMap(void);
 /* Bound the camera to the supplied FRect */
-void Amphora_BoundCamera(const SDL_FRect *boundary);
+void Amphora_BoundCamera(const AmphoraFRect *boundary);
 /* Remove the currently set camera boundary */
 void Amphora_UnboundCamera(void);
 /* Set the zoom factor for the camera */
-void Amphora_SetCameraZoom(Uint16 factor, Uint16 delay);
+void Amphora_SetCameraZoom(int factor, int delay);
 /* Reset the camera zoom */
-void Amphora_ResetCameraZoom(Uint16 delay);
+void Amphora_ResetCameraZoom(int delay);
 /* Gets the current background color */
-SDL_Color Amphora_GetBGColor(void);
+AmphoraColor Amphora_GetBGColor(void);
 /* Sets the background color */
-void Amphora_SetBGColor(SDL_Color color);
+void Amphora_SetBGColor(AmphoraColor color);
 /* Sets the game window to fullscreen */
 void Amphora_SetWindowFullscreen(void);
 /* Sets the game window to windowed */

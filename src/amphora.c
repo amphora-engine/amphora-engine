@@ -118,19 +118,19 @@ Amphora_QuitGame(void)
 	quit_requested = true;
 }
 
-Uint32
+unsigned int
 Amphora_GetFrame(void)
 {
 	return frame_count;
 }
 
-Uint32
+int
 Amphora_GetFPS(void)
 {
-	return framerate;
+	return (int)framerate;
 }
 
-Uint32
+unsigned int
 Amphora_GetTicks(void)
 {
 	return SDL_GetTicks();
