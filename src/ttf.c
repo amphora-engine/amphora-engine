@@ -17,7 +17,7 @@ static const char **font_paths;
 static int font_count;
 
 AmphoraString *
-Amphora_CreateString(const char *font_name, const int pt, const float x, const float y, const int order, const AmphoraColor color, const bool stationary, const char *fmt, va_list args)
+Amphora_CreateStringV1(const char *font_name, const int pt, const float x, const float y, const int order, const AmphoraColor color, const bool stationary, const char *fmt, va_list args)
 {
 	struct render_list_node_t *render_list_node = Amphora_AddRenderListNode(order);
 	struct amphora_message_t *msg;
@@ -68,31 +68,31 @@ Amphora_CreateString(const char *font_name, const int pt, const float x, const f
 }
 
 size_t
-Amphora_GetStringLength(const AmphoraString *msg)
+Amphora_GetStringLengthV1(const AmphoraString *msg)
 {
 	return msg->len;
 }
 
 size_t
-Amphora_GetNumCharactersDisplayed(const AmphoraString *msg)
+Amphora_GetNumCharactersDisplayedV1(const AmphoraString *msg)
 {
 	return msg->n;
 }
 
 const char *
-Amphora_GetStringText(AmphoraString *msg)
+Amphora_GetStringTextV1(AmphoraString *msg)
 {
 	return msg->text;
 }
 
 char
-Amphora_GetStringCharAtIndex(const AmphoraString *msg, int idx)
+Amphora_GetStringCharAtIndexV1(const AmphoraString *msg, int idx)
 {
 	return msg->text[idx];
 }
 
 AmphoraString *
-Amphora_UpdateStringText(AmphoraString *msg, const char *fmt, va_list args)
+Amphora_UpdateStringTextV1(AmphoraString *msg, const char *fmt, va_list args)
 {
 	char text[4096];
 
@@ -118,7 +118,7 @@ Amphora_UpdateStringText(AmphoraString *msg, const char *fmt, va_list args)
 }
 
 AmphoraString *
-Amphora_UpdateStringCharsDisplayed(AmphoraString *msg, size_t n)
+Amphora_UpdateStringCharsDisplayedV1(AmphoraString *msg, size_t n)
 {
 	if (n > msg->len) n = 0;
 	msg->n = n;
@@ -129,7 +129,7 @@ Amphora_UpdateStringCharsDisplayed(AmphoraString *msg, size_t n)
 }
 
 void
-Amphora_FreeString(AmphoraString *msg)
+Amphora_FreeStringV1(AmphoraString *msg)
 {
 	if (!msg) return;
 
@@ -141,17 +141,17 @@ Amphora_FreeString(AmphoraString *msg)
 }
 
 void
-Amphora_RenderString(const AmphoraString *msg)
+Amphora_RenderStringV1(const AmphoraString *msg)
 {
 	SDL_FRect pos_adj;
-	const Vector2f camera = Amphora_GetCamera();
-	Vector2 logical_size = Amphora_GetRenderLogicalSize();
+	const Vector2f camera = Amphora_GetCameraV1();
+	Vector2 logical_size = Amphora_GetRenderLogicalSizeV1();
 
 	if (msg->render_list_node->stationary)
 	{
 		pos_adj = (SDL_FRect){
-			.x = msg->rectangle.x > 0 ? msg->rectangle.x : (float) Amphora_GetResolution().x + msg->rectangle.x - msg->rectangle.w,
-			.y = msg->rectangle.y > 0 ? msg->rectangle.y : (float) Amphora_GetResolution().y + msg->rectangle.y - msg->rectangle.h,
+			.x = msg->rectangle.x > 0 ? msg->rectangle.x : (float) Amphora_GetResolutionV1().x + msg->rectangle.x - msg->rectangle.w,
+			.y = msg->rectangle.y > 0 ? msg->rectangle.y : (float) Amphora_GetResolutionV1().y + msg->rectangle.y - msg->rectangle.h,
 			.w = msg->rectangle.w,
 			.h = msg->rectangle.h
 		};
@@ -166,7 +166,7 @@ Amphora_RenderString(const AmphoraString *msg)
 		};
 	}
 
-	if (msg->render_list_node->stationary) Amphora_SetRenderLogicalSize(Amphora_GetResolution());
+	if (msg->render_list_node->stationary) Amphora_SetRenderLogicalSize(Amphora_GetResolutionV1());
 	Amphora_RenderTexture(msg->texture, NULL, &pos_adj, 0, 0);
 	if (msg->render_list_node->stationary) Amphora_SetRenderLogicalSize(logical_size);
 }

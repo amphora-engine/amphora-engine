@@ -25,7 +25,7 @@ static Vector2f joystickl_state;
 static Vector2f joystickr_state;
 
 void
-Amphora_LoadKeymap(void)
+Amphora_LoadKeymapV1(void)
 {
 	sqlite3 *db = Amphora_GetDB();
 	sqlite3_stmt *stmt;
@@ -66,7 +66,7 @@ Amphora_LoadKeymap(void)
 }
 
 int
-Amphora_UpdateKeymap(const char *action, SDL_Keycode keycode)
+Amphora_UpdateKeymapV1(const char *action, SDL_Keycode keycode)
 {
 	sqlite3 *db = Amphora_GetDB();
 	sqlite3_stmt *stmt;
@@ -84,13 +84,13 @@ Amphora_UpdateKeymap(const char *action, SDL_Keycode keycode)
 }
 
 bool
-Amphora_ObjectClicked(void *obj, int button, void (*callback)(void))
+Amphora_ObjectClickedV1(void *obj, int button, void (*callback)(void))
 {
 	int x, y;
 	Uint32 flags;
 	SDL_FRect *rect;
 	IAmphoraObject *obj_generic = obj;
-	Camera camera = Amphora_GetCamera();
+	Camera camera = Amphora_GetCameraV1();
 
 	switch (obj_generic->type)
 	{
@@ -117,13 +117,13 @@ Amphora_ObjectClicked(void *obj, int button, void (*callback)(void))
 }
 
 bool
-Amphora_ObjectHover(void *obj)
+Amphora_ObjectHoverV1(void *obj)
 {
 	int x;
 	int y;
 	SDL_FRect *rect;
 	IAmphoraObject *obj_generic = obj;
-	Camera camera = Amphora_GetCamera();
+	Camera camera = Amphora_GetCameraV1();
 
 	switch (obj_generic->type)
 	{
@@ -143,37 +143,37 @@ Amphora_ObjectHover(void *obj)
 }
 
 SDL_Keycode
-Amphora_GetPressedKey(void)
+Amphora_GetPressedKeyV1(void)
 {
 	return pressed_key;
 }
 
 bool
-Amphora_LeftJoystickActive(void)
+Amphora_LeftJoystickActiveV1(void)
 {
 	return joystickl_active;
 }
 
 bool
-Amphora_RightJoystickActive(void)
+Amphora_RightJoystickActiveV1(void)
 {
 	return joystickr_active;
 }
 
 Vector2f
-Amphora_GetLeftJoystickState(void)
+Amphora_GetLeftJoystickStateV1(void)
 {
 	return joystickl_state;
 }
 
 Vector2f
-Amphora_GetRightJoystickState(void)
+Amphora_GetRightJoystickStateV1(void)
 {
 	return joystickr_state;
 }
 
 const char *
-Amphora_GetActionKeyName(const char *action)
+Amphora_GetActionKeyNameV1(const char *action)
 {
 	sqlite3 *db = Amphora_GetDB();
 	sqlite3_stmt *stmt;
@@ -201,7 +201,7 @@ Amphora_GetActionKeyName(const char *action)
 }
 
 void
-Amphora_ForEachAction(void (*callback)(const char *, int))
+Amphora_ForEachActionV1(void (*callback)(const char *, int))
 {
 	int i;
 

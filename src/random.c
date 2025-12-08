@@ -5,7 +5,7 @@
 static Uint32 rand_state;
 
 int
-Amphora_GetRandom(int n)
+Amphora_GetRandomV1(int n)
 {
 	if (n > UINT16_MAX) n = UINT16_MAX;
 	if (n <= 0) return 0;
@@ -17,9 +17,9 @@ Amphora_GetRandom(int n)
 }
 
 float
-Amphora_GetRandomF(void)
+Amphora_GetRandomFV1(void)
 {
-	return (float)Amphora_GetRandom(UINT16_MAX) / (float)UINT16_MAX;
+	return (float)Amphora_GetRandomV1(UINT16_MAX) / (float)UINT16_MAX;
 }
 
 /*

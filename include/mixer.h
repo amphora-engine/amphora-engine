@@ -8,23 +8,23 @@
 extern "C" {
 #endif
 /* Play a sound effect */
-void Amphora_PlaySFX(const char *name, int channel, int repeat);
+void Amphora_PlaySFXV1(const char *name, int channel, int repeat);
 /* Sets the volume for a sound effect */
-void Amphora_SetSFXVolume(const char *name, int volume);
+void Amphora_SetSFXVolumeV1(const char *name, int volume);
 /* Sets the current music track */
-void Amphora_SetMusic(const char *name);
+void Amphora_SetMusicV1(const char *name);
 /* Play the current set music track with a fade-in, looping infinitely */
-void Amphora_PlayMusic(int ms);
+void Amphora_PlayMusicV1(int ms);
 /* Play the current set music track with a fade-in, looping n times */
-void Amphora_PlayMusicN(int n, int ms);
+void Amphora_PlayMusicNV1(int n, int ms);
 /* Pause the currently playing music track */
-void Amphora_PauseMusic(void);
+void Amphora_PauseMusicV1(void);
 /* Unpause the currently playing music track if paused */
-void Amphora_UnpauseMusic(void);
+void Amphora_UnpauseMusicV1(void);
 /* Stop the currently playing music track and free its resources immediately */
-void Amphora_StopMusic(void);
+void Amphora_StopMusicV1(void);
 /* Stop the currently playing music track and free its resources after a fade-out */
-void Amphora_FadeOutMusic(int ms);
+void Amphora_FadeOutMusicV1(int ms);
 #ifdef __cplusplus
 };
 #endif

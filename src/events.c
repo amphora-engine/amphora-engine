@@ -11,7 +11,7 @@ static int ev_count, ev_max = EVENT_BLOCK_SIZE;
 static HT_HashTable ev_table;
 
 int
-Amphora_RegisterEvent(const char *name, void (*func)(void))
+Amphora_RegisterEventV1(const char *name, void (*func)(void))
 {
 	int i;
 
@@ -47,7 +47,7 @@ Amphora_RegisterEvent(const char *name, void (*func)(void))
 }
 
 int
-Amphora_UnregisterEvent(const char *name)
+Amphora_UnregisterEventV1(const char *name)
 {
 	int i = (int)HT_GetStatus(name, ev_table);
 
@@ -127,7 +127,7 @@ Amphora_ProcessEventLoop(SDL_Event *e)
 			case SDL_WINDOWEVENT:
 				if (e->window.event != SDL_WINDOWEVENT_RESIZED) break;
 
-				Amphora_SetRenderLogicalSize(Amphora_GetResolution());
+				Amphora_SetRenderLogicalSize(Amphora_GetResolutionV1());
 				break;
 			default:
 				break;

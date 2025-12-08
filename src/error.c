@@ -6,19 +6,19 @@ static AmphoraStatusCode err_code;
 static void (*catastrophe_handler)(void) = NULL;
 
 const char *
-Amphora_GetError(void)
+Amphora_GetErrorV1(void)
 {
 	return err_buff;
 }
 
 AmphoraStatusCode
-Amphora_GetErrorCode(void)
+Amphora_GetErrorCodeV1(void)
 {
 	return err_code;
 }
 
 void
-Amphora_SetCatastropheHandler(void (*func)(void))
+Amphora_SetCatastropheHandlerV1(void (*func)(void))
 {
 	catastrophe_handler = func;
 }

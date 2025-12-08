@@ -22,9 +22,9 @@ Amphora_Connect(void)
 {
 	size_t version_string_len = strlen(ENGINE_SUFFIX) + strlen(VERSION_STRING) + 2;
 
-#define AMPHORA_VFUNCTION_V1(ret, name, sig_args, p_sig_args, call_args) aapi_v1.name = Amphora_##name
-#define AMPHORA_FUNCTION_V1(ret, name, sig_args, call_args) aapi_v1.name = Amphora_##name
-#define AMPHORA_ROUTINE_V1(name, sig_args, call_args) aapi_v1.name = Amphora_##name
+#define AMPHORA_VFUNCTION_V1(ret, name, sig_args, p_sig_args, call_args) aapi_v1.name = Amphora_##name##V1
+#define AMPHORA_FUNCTION_V1(ret, name, sig_args, call_args) aapi_v1.name = Amphora_##name##V1
+#define AMPHORA_ROUTINE_V1(name, sig_args, call_args) aapi_v1.name = Amphora_##name##V1
 	#include "amphora_api.def"
 #undef AMPHORA_VFUNCTION_V1
 #undef AMPHORA_FUNCTION_V1

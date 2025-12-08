@@ -25,7 +25,7 @@ static SDL_FRect camera_boundary;
 static Uint32 render_list_node_count;
 
 Vector2
-Amphora_GetResolution(void)
+Amphora_GetResolutionV1(void)
 {
 	Sint32 rx, ry;
 	SDL_GetWindowSize(window, &rx, &ry);
@@ -33,49 +33,49 @@ Amphora_GetResolution(void)
 }
 
 Vector2
-Amphora_GetRenderLogicalSize(void)
+Amphora_GetRenderLogicalSizeV1(void)
 {
 	return render_logical_size;
 }
 
 Vector2f
-Amphora_GetCamera(void)
+Amphora_GetCameraV1(void)
 {
 	return camera;
 }
 
 void
-Amphora_SetCamera(float x, float y)
+Amphora_SetCameraV1(float x, float y)
 {
 	camera.x = x;
 	camera.y = y;
 }
 
 void
-Amphora_MoveCamera(float delta_x, float delta_y)
+Amphora_MoveCameraV1(float delta_x, float delta_y)
 {
 	camera.x += delta_x;
 	camera.y += delta_y;
 }
 
 void
-Amphora_SetCameraTarget(AmphoraImage *target)
+Amphora_SetCameraTargetV1(AmphoraImage *target)
 {
 	camera_mode = target ? CAM_TRACKING : CAM_MANUAL;
 	camera_target = target;
 }
 
 void
-Amphora_BoundCameraToMap(void)
+Amphora_BoundCameraToMapV1(void)
 {
-	AmphoraFRect map_rect = *Amphora_GetMapRectangle();
+	AmphoraFRect map_rect = *Amphora_GetMapRectangleV1();
 	SDL_FRect rect = { map_rect.x, map_rect.y, map_rect.w, map_rect.h };
 
 	SDL_memcpy(&camera_boundary, &rect, sizeof(camera_boundary));
 }
 
 void
-Amphora_BoundCamera(const AmphoraFRect *boundary)
+Amphora_BoundCameraV1(const AmphoraFRect *boundary)
 {
 	SDL_FRect rect = { boundary->x, boundary->y, boundary->w, boundary->h };
 
@@ -83,20 +83,20 @@ Amphora_BoundCamera(const AmphoraFRect *boundary)
 }
 
 void
-Amphora_UnboundCamera(void)
+Amphora_UnboundCameraV1(void)
 {
 	SDL_memset(&camera_boundary, 0, sizeof(camera_boundary));
 }
 
 void
-Amphora_SetCameraZoom(int factor, int delay)
+Amphora_SetCameraZoomV1(int factor, int delay)
 {
 	static int current_factor = 100;
 	static Vector2 *scale_steps = NULL;
 	static int scale_steps_index = 0;
 	static int scale_steps_count = 0;
-	Vector2 current_resolution = Amphora_GetResolution();
-	Vector2 current_logical_size = Amphora_GetRenderLogicalSize();
+	Vector2 current_resolution = Amphora_GetResolutionV1();
+	Vector2 current_logical_size = Amphora_GetRenderLogicalSizeV1();
 	int i;
 	Vector2 step_size = {
 		.x = (current_logical_size.x - ((current_resolution.x * 100) / factor)) / (delay ? delay : 1),
@@ -134,7 +134,7 @@ Amphora_SetCameraZoom(int factor, int delay)
 		if (current_factor == 100)
 			Amphora_SetRenderLogicalSize(current_resolution);
 #ifdef DEBUG
-		SDL_Log("Finished scaling to %d, %d\n", Amphora_GetRenderLogicalSize().x, Amphora_GetRenderLogicalSize().y);
+		SDL_Log("Finished scaling to %d, %d\n", Amphora_GetRenderLogicalSizeV1().x, Amphora_GetRenderLogicalSizeV1().y);
 #endif
 		return;
 	}
@@ -142,13 +142,13 @@ Amphora_SetCameraZoom(int factor, int delay)
 }
 
 void
-Amphora_ResetCameraZoom(int delay)
+Amphora_ResetCameraZoomV1(int delay)
 {
-	Amphora_SetCameraZoom(100, delay);
+	Amphora_SetCameraZoomV1(100, delay);
 }
 
 AmphoraColor
-Amphora_GetBGColor(void)
+Amphora_GetBGColorV1(void)
 {
 	AmphoraColor abg = { .r = bg.r, .g = bg.g, .b = bg.b, .a = bg.a};
 
@@ -156,7 +156,7 @@ Amphora_GetBGColor(void)
 }
 
 void
-Amphora_SetBGColor(AmphoraColor color)
+Amphora_SetBGColorV1(AmphoraColor color)
 {
 	bg.r = color.r;
 	bg.g = color.g;
@@ -165,19 +165,19 @@ Amphora_SetBGColor(AmphoraColor color)
 }
 
 void
-Amphora_SetWindowFullscreen(void)
+Amphora_SetWindowFullscreenV1(void)
 {
 	SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
 }
 
 void
-Amphora_SetWindowWindowed(void)
+Amphora_SetWindowWindowedV1(void)
 {
 	SDL_SetWindowFullscreen(window, 0);
 }
 
 bool
-Amphora_IsWindowFullscreen(void)
+Amphora_IsWindowFullscreenV1(void)
 {
 	return SDL_GetWindowFlags(window) & SDL_WINDOW_FULLSCREEN_DESKTOP;
 }
@@ -208,7 +208,7 @@ Amphora_InitRender(void)
 		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Failed to init image system", "Failed to initialize image system", 0);
 		return -1;
 	}
-	Amphora_SetRenderLogicalSize(Amphora_GetResolution());
+	Amphora_SetRenderLogicalSize(Amphora_GetResolutionV1());
 
 	return 0;
 }
@@ -316,10 +316,10 @@ Amphora_ProcessRenderList(void)
 				Amphora_UpdateAndDrawSprite(render_list->data);
 				break;
 			case AMPH_OBJ_TXT:
-				Amphora_RenderString(render_list->data);
+				Amphora_RenderStringV1(render_list->data);
 				break;
 			case AMPH_OBJ_MAP:
-				map_rect = *Amphora_GetMapRectangle();
+				map_rect = *Amphora_GetMapRectangleV1();
 				map_rect.x = -camera.x;
 				map_rect.y = -camera.y;
 				rect = (SDL_FRect){ map_rect.x, map_rect.y, map_rect.w, map_rect.h };
@@ -355,16 +355,16 @@ Amphora_FreeRenderList(void)
 		switch(allocated_addrs[i]->type)
 		{
 			case AMPH_OBJ_SPR:
-				Amphora_FreeSprite((AmphoraImage *)allocated_addrs[i]->data);
+				Amphora_FreeSpriteV1((AmphoraImage *)allocated_addrs[i]->data);
 				break;
 			case AMPH_OBJ_TXT:
-				Amphora_FreeString((AmphoraString *)allocated_addrs[i]->data);
+				Amphora_FreeStringV1((AmphoraString *)allocated_addrs[i]->data);
 				break;
 			case AMPH_OBJ_MAP:
 				SDL_DestroyTexture((SDL_Texture *)allocated_addrs[i]->data);
 				break;
 			case AMPH_OBJ_EMITTER:
-				Amphora_DestroyEmitter((AmphoraEmitter *)allocated_addrs[i]->data);
+				Amphora_DestroyEmitterV1((AmphoraEmitter *)allocated_addrs[i]->data);
 			default:
 				break;
 		}
@@ -385,7 +385,7 @@ Amphora_UpdateCamera(void)
 {
 	if (camera_mode == CAM_MANUAL) return;
 
-	camera = Amphora_GetSpriteCenter(camera_target);
+	camera = Amphora_GetSpriteCenterV1(camera_target);
 	camera.x -= (float)render_logical_size.x / 2.0f;
 	camera.y -= (float)render_logical_size.y / 2.0f;
 	if (!camera_boundary.w && !camera_boundary.h) return;

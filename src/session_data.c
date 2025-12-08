@@ -5,7 +5,7 @@
 static HT_HashTable sd;
 
 long
-Amphora_GetSessionData(const char *key)
+Amphora_GetSessionDataV1(const char *key)
 {
 	long d;
 
@@ -16,7 +16,7 @@ Amphora_GetSessionData(const char *key)
 }
 
 void
-Amphora_StoreSessionData(const char *key, long val)
+Amphora_StoreSessionDataV1(const char *key, long val)
 {
 #ifdef DEBUG
 	SDL_Log("Storing %ld in session data with key %s\n", val, key);
@@ -25,7 +25,7 @@ Amphora_StoreSessionData(const char *key, long val)
 }
 
 void
-Amphora_DeleteSessionData(const char *key)
+Amphora_DeleteSessionDataV1(const char *key)
 {
 #ifdef DEBUG
 	SDL_Log("Deleting key %s from session data\n", key);

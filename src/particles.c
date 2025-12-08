@@ -11,7 +11,7 @@
 SDL_FPoint Amphora_CalculateParticleStartPosition(float start_x, float start_y, int spread_x, int spread_y);
 
 AmphoraEmitter *
-Amphora_CreateEmitter(float x,
+Amphora_CreateEmitterV1(float x,
 			float y,
 			float w,
 			float h,
@@ -99,7 +99,7 @@ Amphora_CreateEmitter(float x,
 }
 
 int
-Amphora_DestroyEmitter(AmphoraEmitter *emitter)
+Amphora_DestroyEmitterV1(AmphoraEmitter *emitter)
 {
 	if (!emitter) return AMPHORA_STATUS_FAIL_UNDEFINED;
 
@@ -123,7 +123,7 @@ Amphora_UpdateAndRenderParticleEmitter(AmphoraEmitter *emitter)
 	SDL_Color color = { 0, 0, 0, 0 };
 	SDL_FRect dst;
 	SDL_FRect target;
-	Camera camera = Amphora_GetCamera();
+	Camera camera = Amphora_GetCameraV1();
 	int i;
 
 	(void)SDL_SetRenderTarget(renderer, emitter->texture);
@@ -174,7 +174,7 @@ SDL_FPoint
 Amphora_CalculateParticleStartPosition(float start_x, float start_y, int spread_x, int spread_y)
 {
 	return (SDL_FPoint) {
-		start_x + (float)(Amphora_GetRandom(spread_x) - spread_x / 2.0),
-		start_y + (float)(Amphora_GetRandom(spread_y) - spread_y / 2.0),
+		start_x + (float)(Amphora_GetRandomV1(spread_x) - spread_x / 2.0),
+		start_y + (float)(Amphora_GetRandomV1(spread_y) - spread_y / 2.0),
 	};
 }

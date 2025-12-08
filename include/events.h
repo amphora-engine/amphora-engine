@@ -6,8 +6,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-int Amphora_RegisterEvent(const char *name, void (*func)(void));
-int Amphora_UnregisterEvent(const char *name);
+int Amphora_RegisterEventV1(const char *name, void (*func)(void));
+int Amphora_UnregisterEventV1(const char *name);
 #ifdef __cplusplus
 }
 #endif

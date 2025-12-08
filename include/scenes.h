@@ -6,8 +6,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-int Amphora_LoadScene(const char *name);
-int Amphora_SetSceneFadeParameters(int ms, AmphoraColor color);
+int Amphora_LoadSceneV1(const char *name);
+int Amphora_SetSceneFadeParametersV1(int ms, AmphoraColor color);
 #ifdef __cplusplus
 }
 #endif

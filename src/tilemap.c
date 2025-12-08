@@ -34,7 +34,7 @@ static AmphoraFRect map_rect;
 static struct amphora_object_groups_t obj_groups;
 
 void
-Amphora_SetMap(const char *name, const float scale)
+Amphora_SetMapV1(const char *name, const float scale)
 {
 	int i;
 	struct render_list_node_t *render_list_node;
@@ -58,13 +58,13 @@ Amphora_SetMap(const char *name, const float scale)
 }
 
 const AmphoraFRect *
-Amphora_GetMapRectangle(void)
+Amphora_GetMapRectangleV1(void)
 {
 	return &map_rect;
 }
 
 int
-Amphora_HideMapLayer(const char *name, int t)
+Amphora_HideMapLayerV1(const char *name, int t)
 {
 	int i, n = Amphora_GetMapLayerByName(name);
 
@@ -78,7 +78,7 @@ Amphora_HideMapLayer(const char *name, int t)
 		return AMPHORA_STATUS_OK;
 	}
 	transition_fader.timer = t;
-	transition_fader.frames = transition_fader.timer * Amphora_GetFPS() / 1000;
+	transition_fader.frames = transition_fader.timer * Amphora_GetFPSV1() / 1000;
 	transition_fader.idx = 0;
 	if (!((transition_fader.steps = Amphora_HeapAlloc(transition_fader.frames * sizeof(Uint8), MEM_MISC))))
 	{
@@ -91,13 +91,13 @@ Amphora_HideMapLayer(const char *name, int t)
 	}
 	tilemap_flags.transitioning = true;
 	tilemap_flags.persist_shown = false;
-	(void)Amphora_RegisterEvent("amph_internal_map_layer_fade", Amphora_MapLayerFadeEvent);
+	(void)Amphora_RegisterEventV1("amph_internal_map_layer_fade", Amphora_MapLayerFadeEvent);
 
 	return AMPHORA_STATUS_OK;
 }
 
 int
-Amphora_ShowMapLayer(const char *name, int t)
+Amphora_ShowMapLayerV1(const char *name, int t)
 {
 	int n = Amphora_GetMapLayerByName(name);
 	int i;
@@ -113,7 +113,7 @@ Amphora_ShowMapLayer(const char *name, int t)
 		return AMPHORA_STATUS_OK;
 	}
 	transition_fader.timer = t;
-	transition_fader.frames = transition_fader.timer * Amphora_GetFPS() / 1000;
+	transition_fader.frames = transition_fader.timer * Amphora_GetFPSV1() / 1000;
 	transition_fader.idx = 0;
 	if (!((transition_fader.steps = Amphora_HeapAlloc(transition_fader.frames * sizeof(Uint8), MEM_MISC))))
 	{
@@ -126,7 +126,7 @@ Amphora_ShowMapLayer(const char *name, int t)
 	}
 	tilemap_flags.transitioning = true;
 	tilemap_flags.persist_shown = true;
-	(void)Amphora_RegisterEvent("amph_internal_map_layer_fade", Amphora_MapLayerFadeEvent);
+	(void)Amphora_RegisterEventV1("amph_internal_map_layer_fade", Amphora_MapLayerFadeEvent);
 
 	return AMPHORA_STATUS_OK;
 }
@@ -419,7 +419,7 @@ Amphora_MapLayerFadeEvent(void)
 	cleanup:
 		tilemap_flags.transitioning = false;
 		Amphora_HeapFree(transition_fader.steps);
-		(void)Amphora_UnregisterEvent("amph_internal_map_layer_fade");
+		(void)Amphora_UnregisterEventV1("amph_internal_map_layer_fade");
 }
 
 /*

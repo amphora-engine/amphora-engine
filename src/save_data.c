@@ -5,7 +5,7 @@
 #include "SDL.h"
 
 int
-Amphora_SaveNumber(const char *attribute, double value)
+Amphora_SaveNumberV1(const char *attribute, double value)
 {
 	sqlite3 *db = Amphora_GetDB();
 	sqlite3_stmt *stmt;
@@ -21,7 +21,7 @@ Amphora_SaveNumber(const char *attribute, double value)
 }
 
 int
-Amphora_SaveString(const char *attribute, const char *value)
+Amphora_SaveStringV1(const char *attribute, const char *value)
 {
 	sqlite3 *db = Amphora_GetDB();
 	sqlite3_stmt *stmt;
@@ -37,7 +37,7 @@ Amphora_SaveString(const char *attribute, const char *value)
 }
 
 double
-Amphora_LoadNumber(const char *attribute, double default_value)
+Amphora_LoadNumberV1(const char *attribute, double default_value)
 {
 	sqlite3 *db = Amphora_GetDB();
 	sqlite3_stmt *stmt;
@@ -58,7 +58,7 @@ Amphora_LoadNumber(const char *attribute, double default_value)
 }
 
 int
-Amphora_LoadString(const char *attribute, char **out_string)
+Amphora_LoadStringV1(const char *attribute, char **out_string)
 {
 	sqlite3 *db = Amphora_GetDB();
 	sqlite3_stmt *stmt;

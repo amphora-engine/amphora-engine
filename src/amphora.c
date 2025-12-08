@@ -93,7 +93,7 @@ Amphora_StartEngine(void)
 	Amphora_InitSave();
 	Amphora_InitSessionData();
 	Amphora_InitInput();
-	Amphora_LoadKeymap();
+	Amphora_LoadKeymapV1();
 	Amphora_InitSceneManager();
 
 	framerate = (Uint32) Amphora_LoadFPS();
@@ -113,25 +113,25 @@ Amphora_StartEngine(void)
 }
 
 void
-Amphora_QuitGame(void)
+Amphora_QuitGameV1(void)
 {
 	quit_requested = true;
 }
 
 unsigned int
-Amphora_GetFrame(void)
+Amphora_GetFrameV1(void)
 {
 	return frame_count;
 }
 
 int
-Amphora_GetFPS(void)
+Amphora_GetFPSV1(void)
 {
 	return (int)framerate;
 }
 
 unsigned int
-Amphora_GetTicks(void)
+Amphora_GetTicksV1(void)
 {
 	return SDL_GetTicks();
 }
@@ -177,7 +177,7 @@ Amphora_MainLoop(SDL_Event *e)
 	else if (frame_time > 1000 / framerate)
 	{
 		SDL_Log("Lag on frame %u (frame took %u ticks, %d ticks per frame)\n", frame_count, frame_end - frame_start, 1000 /
-			Amphora_GetFPS());
+			Amphora_GetFPSV1());
 	}
 #else
 	}
@@ -192,10 +192,10 @@ Amphora_SaveConfig(void)
 	/*
 	 * TODO: Check Save* error codes
 	 */
-	Vector2 win_size = Amphora_GetResolution();
+	Vector2 win_size = Amphora_GetResolutionV1();
 	Uint32 win_flags = SDL_GetWindowFlags(Amphora_GetWindow());
 
-	if (!Amphora_IsWindowFullscreen())
+	if (!Amphora_IsWindowFullscreenV1())
 	{
 		Amphora_SaveWinX(win_size.x);
 		Amphora_SaveWinY(win_size.y);

@@ -7,11 +7,11 @@
 extern "C" {
 #endif
 /* Get the value associated with a key from session data */
-long Amphora_GetSessionData(const char *key);
+long Amphora_GetSessionDataV1(const char *key);
 /* Store a value associated with a key to session data */
-void Amphora_StoreSessionData(const char *key, long val);
+void Amphora_StoreSessionDataV1(const char *key, long val);
 /* Delete a key from session data */
-void Amphora_DeleteSessionData(const char *key);
+void Amphora_DeleteSessionDataV1(const char *key);
 #ifdef __cplusplus
 }
 #endif

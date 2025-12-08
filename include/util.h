@@ -25,10 +25,10 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-void Amphora_QuitGame(void); /* Request to quit the game */
-unsigned int Amphora_GetFrame(void); /* Get the current running framerate */
-int Amphora_GetFPS(void); /* Get the current running framerate */
-unsigned int Amphora_GetTicks(void); /* Get the current running time in milliseconds */
+void Amphora_QuitGameV1(void); /* Request to quit the game */
+unsigned int Amphora_GetFrameV1(void); /* Get the current running framerate */
+int Amphora_GetFPSV1(void); /* Get the current running framerate */
+unsigned int Amphora_GetTicksV1(void); /* Get the current running time in milliseconds */
 #ifdef __cplusplus
 }
 #endif

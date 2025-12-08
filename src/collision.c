@@ -3,7 +3,7 @@
 #include "internal/tilemap.h"
 
 bool
-Amphora_CheckCollision(const void *obj_a, const void *obj_b)
+Amphora_CheckCollisionV1(const void *obj_a, const void *obj_b)
 {
 	if (obj_a == NULL || obj_b == NULL)
 		return false;
@@ -12,7 +12,7 @@ Amphora_CheckCollision(const void *obj_a, const void *obj_b)
 }
 
 AmphoraCollision
-Amphora_CheckObjectGroupCollision(const void *obj, const char *name)
+Amphora_CheckObjectGroupCollisionV1(const void *obj, const char *name)
 {
 	int i, j;
 	int c;

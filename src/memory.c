@@ -32,7 +32,7 @@ static const char *category_names[] = {
 int Amphora_AttemptMemRecovery(int blk, struct amphora_mem_allocation_header_t *header, struct amphora_mem_allocation_header_t *corrupt);
 
 int
-Amphora_HeapPtrToBlkIdx(void *ptr, int *blk, int *idx)
+Amphora_HeapPtrToBlkIdxV1(void *ptr, int *blk, int *idx)
 {
 	const ptrdiff_t raw_idx = (intptr_t)ptr - (intptr_t)&amphora_heap[0][0];
 	const int b = (int)raw_idx / (int)sizeof(AmphoraMemBlock);
@@ -50,13 +50,13 @@ Amphora_HeapPtrToBlkIdx(void *ptr, int *blk, int *idx)
 }
 
 void *
-Amphora_HeapBlkIdxToPtr(int blk, int idx)
+Amphora_HeapBlkIdxToPtrV1(int blk, int idx)
 {
 	return &amphora_heap[blk][idx];
 }
 
 void
-Amphora_HeapDumpBlock(uint8_t blk)
+Amphora_HeapDumpBlockV1(uint8_t blk)
 {
 	unsigned int i;
 
@@ -72,13 +72,13 @@ Amphora_HeapDumpBlock(uint8_t blk)
 }
 
 uint8_t
-Amphora_HeapPeek(uint8_t blk, uint16_t idx)
+Amphora_HeapPeekV1(uint8_t blk, uint16_t idx)
 {
 	return amphora_heap[blk][idx];
 }
 
 void
-Amphora_HeapPoke(uint8_t blk, uint16_t idx, uint8_t val)
+Amphora_HeapPokeV1(uint8_t blk, uint16_t idx, uint8_t val)
 {
 	amphora_heap[blk][idx] = val;
 }

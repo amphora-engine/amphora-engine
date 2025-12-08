@@ -27,9 +27,9 @@ static SDL_Rect fade_rect;
 static bool scene_update_lock = false;
 
 int
-Amphora_LoadScene(const char *name)
+Amphora_LoadSceneV1(const char *name)
 {
-	Vector2 screen_size = Amphora_GetResolution();
+	Vector2 screen_size = Amphora_GetResolutionV1();
 	long idx;
 	int i;
 
@@ -41,7 +41,7 @@ Amphora_LoadScene(const char *name)
 	}
 	current_scene_name = (int)idx;
 
-	if (Amphora_RegisterEvent("amph_internal_scene_transition", Amphora_SceneTransitionEvent) == AMPHORA_STATUS_FAIL_UNDEFINED)
+	if (Amphora_RegisterEventV1("amph_internal_scene_transition", Amphora_SceneTransitionEvent) == AMPHORA_STATUS_FAIL_UNDEFINED)
 	{
 		Amphora_SetError(AMPHORA_STATUS_FAIL_UNDEFINED, "Scene transition event registration failed");
 		return AMPHORA_STATUS_FAIL_UNDEFINED;
@@ -49,7 +49,7 @@ Amphora_LoadScene(const char *name)
 	Amphora_LockSceneUpdate();
 	fade_rect.w = screen_size.x;
 	fade_rect.h = screen_size.y;
-	transition_fader.frames = transition_fader.timer * Amphora_GetFPS() / 1000;
+	transition_fader.frames = transition_fader.timer * Amphora_GetFPSV1() / 1000;
 	if (!((transition_fader.steps = Amphora_HeapAlloc((transition_fader.frames >> 1) * sizeof(Uint8), MEM_MISC))))
 	{
 		Amphora_SetError(AMPHORA_STATUS_ALLOC_FAIL, "Failed to allocate memory for fade steps\n");
@@ -67,7 +67,7 @@ Amphora_LoadScene(const char *name)
 }
 
 int
-Amphora_SetSceneFadeParameters(int ms, AmphoraColor color)
+Amphora_SetSceneFadeParametersV1(int ms, AmphoraColor color)
 {
 	transition_fader.timer = ms;
 	fade_color.r = color.r;
@@ -120,7 +120,7 @@ Amphora_DestroyScene(void)
 	Amphora_FreeObjectGroup();
 	Amphora_FreeAllSFX();
 	Amphora_ResetRenderList();
-	Amphora_UnboundCamera();
+	Amphora_UnboundCameraV1();
 	Amphora_FreeAllIMG();
 	Amphora_FreeAllFonts();
 }
@@ -163,7 +163,7 @@ Amphora_SceneTransitionEvent(void)
 		Amphora_DestroyScene();
 		current_scene_idx = HT_GetValue(scene_names[current_scene_name], scenes);
 		Amphora_InitScene();
-		(void)Amphora_UnregisterEvent("amph_internal_scene_transition");
+		(void)Amphora_UnregisterEventV1("amph_internal_scene_transition");
 		return;
 	}
 	(void)SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
@@ -176,12 +176,12 @@ Amphora_SceneTransitionEvent(void)
 		Amphora_DestroyScene();
 		current_scene_idx = HT_GetValue(scene_names[current_scene_name], scenes);
 		Amphora_InitScene();
-		Amphora_SetCamera(0, 0);
+		Amphora_SetCameraV1(0, 0);
 	}
 	if (transition_fader.idx == 0 && transition_fader.idx_mod == -1)
 	{
 		Amphora_HeapFree(transition_fader.steps);
-		(void)Amphora_UnregisterEvent("amph_internal_scene_transition");
+		(void)Amphora_UnregisterEventV1("amph_internal_scene_transition");
 	}
 }
 

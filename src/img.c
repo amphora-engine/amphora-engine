@@ -17,7 +17,7 @@ static const char **img_paths;
 static int img_count;
 
 Vector2f
-Amphora_GetSpritePosition(const AmphoraImage *spr)
+Amphora_GetSpritePositionV1(const AmphoraImage *spr)
 {
 	Amphora_ValidatePtrNotNull(spr, ((Vector2f){0, 0 }))
 
@@ -25,7 +25,7 @@ Amphora_GetSpritePosition(const AmphoraImage *spr)
 }
 
 Vector2f
-Amphora_GetSpriteCenter(const AmphoraImage *spr)
+Amphora_GetSpriteCenterV1(const AmphoraImage *spr)
 {
 	Amphora_ValidatePtrNotNull(spr, ((Vector2f){0, 0 }))
 
@@ -36,7 +36,7 @@ Amphora_GetSpriteCenter(const AmphoraImage *spr)
 }
 
 bool
-Amphora_IsSpriteFlipped(const AmphoraImage *spr)
+Amphora_IsSpriteFlippedV1(const AmphoraImage *spr)
 {
 	Amphora_ValidatePtrNotNull(spr, false)
 
@@ -44,7 +44,7 @@ Amphora_IsSpriteFlipped(const AmphoraImage *spr)
 }
 
 AmphoraImage *
-Amphora_CreateSprite(const char *image_name,
+Amphora_CreateSpriteV1(const char *image_name,
 			const float x,
 			const float y,
 			const float scale,
@@ -84,7 +84,7 @@ Amphora_CreateSprite(const char *image_name,
 }
 
 int
-Amphora_AddFrameset(AmphoraImage *spr,
+Amphora_AddFramesetV1(AmphoraImage *spr,
 			const char *name,
 			const char *override_img,
 			int sx,
@@ -140,7 +140,7 @@ Amphora_AddFrameset(AmphoraImage *spr,
 }
 
 void
-Amphora_SetFrameset(AmphoraImage *spr, const char *name)
+Amphora_SetFramesetV1(AmphoraImage *spr, const char *name)
 {
 	int idx = (int)HT_GetValue(name, spr->framesets);
 	struct frameset_t *frameset = &spr->frameset_list[idx];
@@ -154,7 +154,7 @@ Amphora_SetFrameset(AmphoraImage *spr, const char *name)
 }
 
 void
-Amphora_PlayOneshot(AmphoraImage *spr, const char *name, void (*callback)(void))
+Amphora_PlayOneshotV1(AmphoraImage *spr, const char *name, void (*callback)(void))
 {
 	int idx = (int)HT_GetValue(name, spr->framesets);
 	struct frameset_t *frameset = &spr->frameset_list[idx];
@@ -171,7 +171,7 @@ Amphora_PlayOneshot(AmphoraImage *spr, const char *name, void (*callback)(void))
 }
 
 int
-Amphora_SetFramesetAnimationTime(AmphoraImage *spr, const char *name, unsigned int delay)
+Amphora_SetFramesetAnimationTimeV1(AmphoraImage *spr, const char *name, unsigned int delay)
 {
 	struct frameset_t *frameset = &spr->frameset_list[HT_GetValue(name, spr->framesets)];
 
@@ -183,7 +183,7 @@ Amphora_SetFramesetAnimationTime(AmphoraImage *spr, const char *name, unsigned i
 }
 
 AmphoraImage *
-Amphora_ReorderSprite(AmphoraImage *spr, int order)
+Amphora_ReorderSpriteV1(AmphoraImage *spr, int order)
 {
 	struct render_list_node_t *new_node = Amphora_AddRenderListNode(order);
 	struct render_list_node_t *old_node = spr->render_list_node;
@@ -206,7 +206,7 @@ Amphora_ReorderSprite(AmphoraImage *spr, int order)
 }
 
 int
-Amphora_SetSpriteLocation(AmphoraImage *spr, float x, float y)
+Amphora_SetSpriteLocationV1(AmphoraImage *spr, float x, float y)
 {
 	Amphora_ValidatePtrNotNull(spr, AMPHORA_STATUS_FAIL_UNDEFINED)
 
@@ -217,7 +217,7 @@ Amphora_SetSpriteLocation(AmphoraImage *spr, float x, float y)
 }
 
 int
-Amphora_MoveSprite(AmphoraImage *spr, float delta_x, float delta_y)
+Amphora_MoveSpriteV1(AmphoraImage *spr, float delta_x, float delta_y)
 {
 	Amphora_ValidatePtrNotNull(spr, AMPHORA_STATUS_FAIL_UNDEFINED)
 
@@ -228,7 +228,7 @@ Amphora_MoveSprite(AmphoraImage *spr, float delta_x, float delta_y)
 }
 
 int
-Amphora_FlipSprite(AmphoraImage *spr)
+Amphora_FlipSpriteV1(AmphoraImage *spr)
 {
 	Amphora_ValidatePtrNotNull(spr, AMPHORA_STATUS_FAIL_UNDEFINED)
 
@@ -238,7 +238,7 @@ Amphora_FlipSprite(AmphoraImage *spr)
 }
 
 int
-Amphora_UnflipSprite(AmphoraImage *spr)
+Amphora_UnflipSpriteV1(AmphoraImage *spr)
 {
 	Amphora_ValidatePtrNotNull(spr, AMPHORA_STATUS_FAIL_UNDEFINED)
 
@@ -248,7 +248,7 @@ Amphora_UnflipSprite(AmphoraImage *spr)
 }
 
 int
-Amphora_ShowSprite(AmphoraImage *spr)
+Amphora_ShowSpriteV1(AmphoraImage *spr)
 {
 	Amphora_ValidatePtrNotNull(spr, AMPHORA_STATUS_FAIL_UNDEFINED)
 
@@ -258,7 +258,7 @@ Amphora_ShowSprite(AmphoraImage *spr)
 }
 
 int
-Amphora_HideSprite(AmphoraImage *spr)
+Amphora_HideSpriteV1(AmphoraImage *spr)
 {
 	Amphora_ValidatePtrNotNull(spr, AMPHORA_STATUS_FAIL_UNDEFINED)
 
@@ -268,7 +268,7 @@ Amphora_HideSprite(AmphoraImage *spr)
 }
 
 void
-Amphora_ApplyFXToImage(AmphoraImage *img, void (*fx)(AmphoraSurface *))
+Amphora_ApplyFXToImageV1(AmphoraImage *img, void (*fx)(AmphoraSurface *))
 {
 	AmphoraSurface surface;
 
@@ -282,7 +282,7 @@ Amphora_ApplyFXToImage(AmphoraImage *img, void (*fx)(AmphoraSurface *))
 }
 
 void
-Amphora_ResetImage(AmphoraImage *img)
+Amphora_ResetImageV1(AmphoraImage *img)
 {
 	(void)SDL_memcpy(img->surface->pixels, img->surface_orig->pixels,
 		img->surface_orig->w * img->surface_orig->h * img->surface_orig->format->BytesPerPixel);
@@ -290,11 +290,11 @@ Amphora_ResetImage(AmphoraImage *img)
 }
 
 int
-Amphora_FreeSprite(AmphoraImage *spr)
+Amphora_FreeSpriteV1(AmphoraImage *spr)
 {
 	Amphora_ValidatePtrNotNull(spr, AMPHORA_STATUS_FAIL_UNDEFINED)
 
-	if (spr == Amphora_GetCameraTarget()) Amphora_SetCameraTarget(NULL);
+	if (spr == Amphora_GetCameraTarget()) Amphora_SetCameraTargetV1(NULL);
 	if (spr->frameset_list) Amphora_HeapFree(spr->frameset_list);
 	HT_FreeTable(spr->framesets);
 	spr->render_list_node->garbage = true;
@@ -377,8 +377,8 @@ Amphora_UpdateAndDrawSprite(AmphoraImage *spr)
 	struct frameset_t *frameset = &spr->frameset_list[spr->current_frameset];
 	SDL_Rect src;
 	SDL_FRect dst;
-	const Vector2f camera = Amphora_GetCamera();
-	Vector2 logical_size = Amphora_GetRenderLogicalSize();
+	const Vector2f camera = Amphora_GetCameraV1();
+	Vector2 logical_size = Amphora_GetRenderLogicalSizeV1();
 	Uint32 cur_ms = SDL_GetTicks();
 
 	if (!(spr->render_list_node->display && spr->num_framesets > 0)) return;
@@ -415,8 +415,8 @@ Amphora_UpdateAndDrawSprite(AmphoraImage *spr)
 	if (spr->render_list_node->stationary)
 	{
 		dst = (SDL_FRect){
-			.x = spr->rectangle.x > 0 ? spr->rectangle.x : (float) Amphora_GetResolution().x + spr->rectangle.x - (float)frameset->rectangle.w,
-			.y = spr->rectangle.y > 0 ? spr->rectangle.y : (float) Amphora_GetResolution().y + spr->rectangle.y - (float)frameset->rectangle.h,
+			.x = spr->rectangle.x > 0 ? spr->rectangle.x : (float) Amphora_GetResolutionV1().x + spr->rectangle.x - (float)frameset->rectangle.w,
+			.y = spr->rectangle.y > 0 ? spr->rectangle.y : (float) Amphora_GetResolutionV1().y + spr->rectangle.y - (float)frameset->rectangle.h,
 			.w = (float)frameset->rectangle.w * spr->scale,
 			.h = (float)frameset->rectangle.h * spr->scale
 		};
@@ -432,7 +432,7 @@ Amphora_UpdateAndDrawSprite(AmphoraImage *spr)
 	}
 
 	if (spr->render_list_node->stationary)
-		Amphora_SetRenderLogicalSize(Amphora_GetResolution());
+		Amphora_SetRenderLogicalSize(Amphora_GetResolutionV1());
 
 	Amphora_RenderTexture(frameset->override_img ? frameset->override_img : spr->image,
 			      &src, &dst, 0, spr->flip ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE);

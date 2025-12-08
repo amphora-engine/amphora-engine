@@ -7,9 +7,9 @@
 extern "C" {
 #endif
 /* Get a 16-bit random number less than n */
-int Amphora_GetRandom(int n);
+int Amphora_GetRandomV1(int n);
 /* Get a random float 0.0 to 1.0 */
-float Amphora_GetRandomF(void);
+float Amphora_GetRandomFV1(void);
 #ifdef __cplusplus
 }
 #endif

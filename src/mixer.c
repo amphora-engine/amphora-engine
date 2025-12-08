@@ -17,7 +17,7 @@ static const char **music_paths;
 static int music_count;
 
 void
-Amphora_PlaySFX(const char *name, const int channel, const int repeat)
+Amphora_PlaySFXV1(const char *name, const int channel, const int repeat)
 {
 	SDL_RWops *sfx_rw = NULL;
 	Mix_Chunk *sfx_chunk = NULL;
@@ -41,7 +41,7 @@ Amphora_PlaySFX(const char *name, const int channel, const int repeat)
 }
 
 void
-Amphora_SetSFXVolume(const char *name, int volume)
+Amphora_SetSFXVolumeV1(const char *name, int volume)
 {
 	if (HT_GetValue(name, sfx) == -1) return;
 
@@ -49,7 +49,7 @@ Amphora_SetSFXVolume(const char *name, int volume)
 }
 
 void
-Amphora_SetMusic(const char *name)
+Amphora_SetMusicV1(const char *name)
 {
 	SDL_RWops *mus_rw = SDL_RWFromFile(HT_GetRef(name, char, music), "rb");
 
@@ -65,7 +65,7 @@ Amphora_SetMusic(const char *name)
 }
 
 void
-Amphora_PlayMusic(int ms)
+Amphora_PlayMusicV1(int ms)
 {
 	if (Mix_PlayingMusic()) return;
 
@@ -73,7 +73,7 @@ Amphora_PlayMusic(int ms)
 }
 
 void
-Amphora_PlayMusicN(int n, int ms)
+Amphora_PlayMusicNV1(int n, int ms)
 {
 	if (Mix_PlayingMusic()) return;
 
@@ -81,7 +81,7 @@ Amphora_PlayMusicN(int n, int ms)
 }
 
 void
-Amphora_PauseMusic(void)
+Amphora_PauseMusicV1(void)
 {
 	if (!Mix_PlayingMusic()) return;
 
@@ -89,7 +89,7 @@ Amphora_PauseMusic(void)
 }
 
 void
-Amphora_UnpauseMusic(void)
+Amphora_UnpauseMusicV1(void)
 {
 	if (!Mix_PausedMusic()) return;
 
@@ -97,7 +97,7 @@ Amphora_UnpauseMusic(void)
 }
 
 void
-Amphora_StopMusic(void)
+Amphora_StopMusicV1(void)
 {
 	if (!Mix_PlayingMusic()) return;
 
@@ -105,7 +105,7 @@ Amphora_StopMusic(void)
 }
 
 void
-Amphora_FadeOutMusic(int ms)
+Amphora_FadeOutMusicV1(int ms)
 {
 	if (!Mix_PlayingMusic()) return;
 

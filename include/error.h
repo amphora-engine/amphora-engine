@@ -14,11 +14,11 @@ typedef enum {
 extern "C" {
 #endif
 /* Gets the last set error message */
-const char *Amphora_GetError(void);
+const char *Amphora_GetErrorV1(void);
 /* Gets the last set error code */
-AmphoraStatusCode Amphora_GetErrorCode(void);
+AmphoraStatusCode Amphora_GetErrorCodeV1(void);
 /* Sets a custom catastrophe handler function in case of an unrecoverable error */
-void Amphora_SetCatastropheHandler(void (*)(void));
+void Amphora_SetCatastropheHandlerV1(void (*)(void));
 #ifdef __cplusplus
 }
 #endif

@@ -10,12 +10,12 @@ static struct amphora_typewriter_t typewriters[MAX_CONCURRENT_TYPEWRITERS];
 static unsigned int typewriters_count;
 
 TypewriterStatus
-Amphora_TypeString(AmphoraString *string, int ms, void (*callback)(int, char))
+Amphora_TypeStringV1(AmphoraString *string, int ms, void (*callback)(int, char))
 {
 	int i;
 
 	if (!string) return TYPEWRITER_NOSTRING;
-	if (Amphora_GetStringLength(string) == Amphora_GetNumCharactersDisplayed(string))
+	if (Amphora_GetStringLengthV1(string) == Amphora_GetNumCharactersDisplayedV1(string))
 		return TYPEWRITER_DONE;
 	if (ms <= 0) return TYPEWRITER_ERROR;
 
@@ -38,16 +38,16 @@ Amphora_TypeString(AmphoraString *string, int ms, void (*callback)(int, char))
 		typewriters[i].ms = ms;
 		typewriters[i].last_update = SDL_GetTicks();
 		typewriters[i].used = true;
-		(void)Amphora_UpdateStringCharsDisplayed(string, 1);
+		(void)Amphora_UpdateStringCharsDisplayedV1(string, 1);
 		typewriters_count++;
 		return TYPEWRITER_CREATED;
 	}
 	if (SDL_GetTicks() - typewriters[i].last_update <= typewriters[i].ms) return TYPEWRITER_WAITING;
 
 	typewriters[i].last_update = SDL_GetTicks();
-	if (callback) callback(typewriters[i].ticker, Amphora_GetStringCharAtIndex(string, typewriters[i].ticker));
-	(void)Amphora_UpdateStringCharsDisplayed(string, ++typewriters[i].ticker);
-	if (typewriters[i].ticker == (ssize_t)Amphora_GetStringLength(string))
+	if (callback) callback(typewriters[i].ticker, Amphora_GetStringCharAtIndexV1(string, typewriters[i].ticker));
+	(void)Amphora_UpdateStringCharsDisplayedV1(string, ++typewriters[i].ticker);
+	if (typewriters[i].ticker == (ssize_t)Amphora_GetStringLengthV1(string))
 	{
 		typewriters[i].used = false;
 		typewriters[i].string = NULL;
@@ -60,12 +60,12 @@ Amphora_TypeString(AmphoraString *string, int ms, void (*callback)(int, char))
 }
 
 TypewriterStatus
-Amphora_SetStringTypeSpeed(AmphoraString *string, int ms)
+Amphora_SetStringTypeSpeedV1(AmphoraString *string, int ms)
 {
 	int i;
 
 	if (!string) return TYPEWRITER_NOSTRING;
-	if (Amphora_GetStringLength(string) == Amphora_GetNumCharactersDisplayed(string)) return TYPEWRITER_DONE;
+	if (Amphora_GetStringLengthV1(string) == Amphora_GetNumCharactersDisplayedV1(string)) return TYPEWRITER_DONE;
 	if (ms <= 0) return TYPEWRITER_ERROR;
 
 	for (i = 0; i < MAX_CONCURRENT_TYPEWRITERS; i++)

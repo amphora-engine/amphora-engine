@@ -38,37 +38,37 @@ typedef struct amphora_surface_t
 extern "C" {
 #endif
 /* Get the resolution */
-Vector2 Amphora_GetResolution(void);
+Vector2 Amphora_GetResolutionV1(void);
 /* Get the renderer logical size */
-Vector2 Amphora_GetRenderLogicalSize(void);
+Vector2 Amphora_GetRenderLogicalSizeV1(void);
 /* Get the current upper-left point of the camera */
-Vector2f Amphora_GetCamera(void);
+Vector2f Amphora_GetCameraV1(void);
 /* Set the location of the camera's top left point */
-void Amphora_SetCamera(float x, float y);
+void Amphora_SetCameraV1(float x, float y);
 /* Move the camera */
-void Amphora_MoveCamera(float delta_x, float delta_y);
+void Amphora_MoveCameraV1(float delta_x, float delta_y);
 /* Set the sprite for the camera to follow, NULL to disable tracking */
-void Amphora_SetCameraTarget(AmphoraImage *target);
+void Amphora_SetCameraTargetV1(AmphoraImage *target);
 /* Bound the camera to the current map area */
-void Amphora_BoundCameraToMap(void);
+void Amphora_BoundCameraToMapV1(void);
 /* Bound the camera to the supplied FRect */
-void Amphora_BoundCamera(const AmphoraFRect *boundary);
+void Amphora_BoundCameraV1(const AmphoraFRect *boundary);
 /* Remove the currently set camera boundary */
-void Amphora_UnboundCamera(void);
+void Amphora_UnboundCameraV1(void);
 /* Set the zoom factor for the camera */
-void Amphora_SetCameraZoom(int factor, int delay);
+void Amphora_SetCameraZoomV1(int factor, int delay);
 /* Reset the camera zoom */
-void Amphora_ResetCameraZoom(int delay);
+void Amphora_ResetCameraZoomV1(int delay);
 /* Gets the current background color */
-AmphoraColor Amphora_GetBGColor(void);
+AmphoraColor Amphora_GetBGColorV1(void);
 /* Sets the background color */
-void Amphora_SetBGColor(AmphoraColor color);
+void Amphora_SetBGColorV1(AmphoraColor color);
 /* Sets the game window to fullscreen */
-void Amphora_SetWindowFullscreen(void);
+void Amphora_SetWindowFullscreenV1(void);
 /* Sets the game window to windowed */
-void Amphora_SetWindowWindowed(void);
+void Amphora_SetWindowWindowedV1(void);
 /* Returns true if the game window is fullscreen, false if windowed */
-bool Amphora_IsWindowFullscreen(void);
+bool Amphora_IsWindowFullscreenV1(void);
 #ifdef __cplusplus
 }
 #endif
