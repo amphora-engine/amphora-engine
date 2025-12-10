@@ -67,6 +67,22 @@ Amphora_CreateStringV1(const char *font_name, const int pt, const float x, const
 	return msg;
 }
 
+void
+Amphora_ShowStringV1(AmphoraString *msg)
+{
+	if (msg == NULL) return;
+
+	msg->render_list_node->display = true;
+}
+
+void
+Amphora_HideStringV1(AmphoraString *msg)
+{
+	if (msg == NULL) return;
+
+	msg->render_list_node->display = false;
+}
+
 size_t
 Amphora_GetStringLengthV1(const AmphoraString *msg)
 {
@@ -89,6 +105,12 @@ char
 Amphora_GetStringCharAtIndexV1(const AmphoraString *msg, int idx)
 {
 	return msg->text[idx];
+}
+
+Vector2
+Amphora_GetStringDimensionsV1(const AmphoraString *msg)
+{
+	return (Vector2){ (int)msg->rectangle.w, (int)msg->rectangle.h };
 }
 
 AmphoraString *
@@ -124,6 +146,15 @@ Amphora_UpdateStringCharsDisplayedV1(AmphoraString *msg, size_t n)
 	msg->n = n;
 	SDL_DestroyTexture(msg->texture);
 	msg->texture = Amphora_RenderStringToTexture(msg);
+
+	return msg;
+}
+
+AmphoraString *
+Amphora_UpdateStringPositionV1(AmphoraString *msg, float x, float y)
+{
+	msg->rectangle.x = x;
+	msg->rectangle.y = y;
 
 	return msg;
 }

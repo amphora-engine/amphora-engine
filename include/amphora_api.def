@@ -119,15 +119,19 @@ AMPHORA_VFUNCTION_V1(AmphoraString *, CreateString,
 	(const char *font_name, int pt, float x, float y, int order, AmphoraColor color, bool stationary, const char *fmt, ...),
 	(const char *font_name, int pt, float x, float y, int order, AmphoraColor color, bool stationary, const char *fmt, va_list args),
 	(font_name, pt, x, y, order, color, stationary, fmt, args));
+AMPHORA_ROUTINE_V1(ShowString, (AmphoraString *msg), (msg));
+AMPHORA_ROUTINE_V1(HideString, (AmphoraString *msg), (msg));
 AMPHORA_FUNCTION_V1(size_t, GetStringLength, (const AmphoraString *msg), (msg));
 AMPHORA_FUNCTION_V1(size_t, GetNumCharactersDisplayed, (const AmphoraString *msg), (msg));
 AMPHORA_FUNCTION_V1(const char *, GetStringText, (AmphoraString *msg), (msg));
 AMPHORA_FUNCTION_V1(char, GetStringCharAtIndex, (const AmphoraString *msg, int idx), (msg, idx));
+AMPHORA_FUNCTION_V1(Vector2, GetStringDimensions, (const AmphoraString *msg), (msg));
 AMPHORA_VFUNCTION_V1(AmphoraString *, UpdateStringText,
 	(AmphoraString *msg, const char *fmt, ...),
 	(AmphoraString *msg, const char *fmt, va_list args),
 	(msg, fmt, args));
 AMPHORA_FUNCTION_V1(AmphoraString *, UpdateStringCharsDisplayed, (AmphoraString *msg, size_t n), (msg, n));
+AMPHORA_FUNCTION_V1(AmphoraString *, UpdateStringPosition, (AmphoraString *msg, float x, float y), (msg, x, y));
 AMPHORA_ROUTINE_V1(FreeString, (AmphoraString *msg), (msg));
 AMPHORA_ROUTINE_V1(RenderString, (const AmphoraString *msg), (msg));
 
