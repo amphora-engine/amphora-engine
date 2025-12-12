@@ -3,6 +3,7 @@
 #include "internal/particles.h"
 #include "internal/random.h"
 #include "internal/render.h"
+#include "internal/system.h"
 
 /*
  * Prototypes for private functions
@@ -102,6 +103,7 @@ int
 Amphora_DestroyEmitterV1(AmphoraEmitter *emitter)
 {
 	if (!emitter) return AMPHORA_STATUS_FAIL_UNDEFINED;
+	if (Amphora_IsEngineRunningV1() == false) return AMPHORA_STATUS_OK;
 
 	SDL_DestroyTexture(emitter->texture);
 	Amphora_HeapFree(emitter->particles);

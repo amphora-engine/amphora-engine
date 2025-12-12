@@ -1,0 +1,8 @@
+#ifndef AMPHORA_SYSTEM_H
+#define AMPHORA_SYSTEM_H
+
+#include "util.h"
+
+bool Amphora_IsEngineRunningV1(void);
+
+#endif /* AMPHORA_SYSTEM_H */

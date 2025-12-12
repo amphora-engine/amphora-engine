@@ -3,6 +3,7 @@
 #include "internal/lib.h"
 #include "internal/memory.h"
 #include "internal/render.h"
+#include "internal/system.h"
 
 /* Prototypes for private functions */
 static void Amphora_LoadIMGTexture(const char *name);
@@ -293,6 +294,7 @@ int
 Amphora_FreeSpriteV1(AmphoraImage *spr)
 {
 	Amphora_ValidatePtrNotNull(spr, AMPHORA_STATUS_FAIL_UNDEFINED)
+	if (Amphora_IsEngineRunningV1() == false) return AMPHORA_STATUS_OK;
 
 	if (spr == Amphora_GetCameraTarget()) Amphora_SetCameraTargetV1(NULL);
 	if (spr->frameset_list) Amphora_HeapFree(spr->frameset_list);

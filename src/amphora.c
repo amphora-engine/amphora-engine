@@ -12,6 +12,7 @@
 #include "internal/save_data.h"
 #include "internal/scenes.h"
 #include "internal/session_data.h"
+#include "internal/system.h"
 #include "internal/tilemap.h"
 #include "internal/ttf.h"
 
@@ -24,6 +25,7 @@ static void Amphora_CleanResources(void);
 static Uint32 frame_count = 0;
 static Uint32 framerate;
 static bool quit_requested = false;
+static bool engine_running = false;
 
 int
 Amphora_StartEngine(void)
@@ -96,6 +98,7 @@ Amphora_StartEngine(void)
 	Amphora_LoadKeymapV1();
 	Amphora_InitSceneManager();
 
+	engine_running = true;
 	framerate = (Uint32) Amphora_LoadFPS();
 
 	Amphora_InitScene();
@@ -108,8 +111,15 @@ Amphora_StartEngine(void)
 	Mix_Quit();
 	TTF_Quit();
 	SDL_Quit();
+	engine_running = false;
 
 	return AMPHORA_STATUS_OK;
+}
+
+bool
+Amphora_IsEngineRunningV1(void)
+{
+	return engine_running;
 }
 
 void

@@ -2,6 +2,7 @@
 #include "internal/ht_hash.h"
 #include "internal/memory.h"
 #include "internal/render.h"
+#include "internal/system.h"
 #include "internal/ttf.h"
 
 #define AMPHORA_MAX_STR_LEN 4096
@@ -163,6 +164,7 @@ void
 Amphora_FreeStringV1(AmphoraString *msg)
 {
 	if (!msg) return;
+	if (Amphora_IsEngineRunningV1() == false) return;
 
 	SDL_DestroyTexture(msg->texture);
 	Amphora_HeapFree(msg->text);
