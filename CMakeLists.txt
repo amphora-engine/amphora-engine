@@ -11,7 +11,7 @@ if(APPLE)
 endif()
 
 set(AMPHORA_ENGINE_SUFFIX "vanilla")
-set(AMPHORA_ENGINE_VERSION_STRING "v0.2.3-alpha")
+set(AMPHORA_ENGINE_VERSION_STRING "v0.2.4-alpha")
 
 project(amphora LANGUAGES C)
 

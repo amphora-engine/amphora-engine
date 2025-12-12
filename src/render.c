@@ -352,19 +352,26 @@ Amphora_FreeRenderList(void)
 	}
 	for (i = 0; i < render_list_node_count; i++)
 	{
+		if (allocated_addrs[i]->garbage)
+		{
+			Amphora_HeapFree(allocated_addrs[i]);
+
+			continue;
+		}
+
 		switch(allocated_addrs[i]->type)
 		{
 			case AMPH_OBJ_SPR:
-				Amphora_FreeSpriteV1((AmphoraImage *)allocated_addrs[i]->data);
+				Amphora_FreeSpriteV1(allocated_addrs[i]->data);
 				break;
 			case AMPH_OBJ_TXT:
-				Amphora_FreeStringV1((AmphoraString *)allocated_addrs[i]->data);
+				Amphora_FreeStringV1(allocated_addrs[i]->data);
 				break;
 			case AMPH_OBJ_MAP:
-				SDL_DestroyTexture((SDL_Texture *)allocated_addrs[i]->data);
+				SDL_DestroyTexture(allocated_addrs[i]->data);
 				break;
 			case AMPH_OBJ_EMITTER:
-				Amphora_DestroyEmitterV1((AmphoraEmitter *)allocated_addrs[i]->data);
+				Amphora_DestroyEmitterV1(allocated_addrs[i]->data);
 			default:
 				break;
 		}
