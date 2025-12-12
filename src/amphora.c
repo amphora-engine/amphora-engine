@@ -24,8 +24,11 @@ static void Amphora_CleanResources(void);
 /* File-scored variables */
 static Uint32 frame_count = 0;
 static Uint32 framerate;
-static bool quit_requested = false;
-static bool engine_running = false;
+static struct
+{
+	bool quit_requested : 1;
+	bool engine_running : 1;
+} engine_flags;
 
 int
 Amphora_StartEngine(void)
@@ -98,7 +101,7 @@ Amphora_StartEngine(void)
 	Amphora_LoadKeymapV1();
 	Amphora_InitSceneManager();
 
-	engine_running = true;
+	engine_flags.engine_running = true;
 	framerate = (Uint32) Amphora_LoadFPS();
 
 	Amphora_InitScene();
@@ -111,21 +114,21 @@ Amphora_StartEngine(void)
 	Mix_Quit();
 	TTF_Quit();
 	SDL_Quit();
-	engine_running = false;
+	engine_flags.engine_running = false;
 
 	return AMPHORA_STATUS_OK;
 }
 
 bool
-Amphora_IsEngineRunningV1(void)
+Amphora_IsEngineRunning(void)
 {
-	return engine_running;
+	return engine_flags.engine_running;
 }
 
 void
 Amphora_QuitGameV1(void)
 {
-	quit_requested = true;
+	engine_flags.quit_requested = true;
 }
 
 unsigned int
@@ -159,8 +162,8 @@ Amphora_MainLoop(SDL_Event *e)
 	frame_start = SDL_GetTicks();
 	frame_count++;
 
-	if (Amphora_ProcessEventLoop(e) == SDL_QUIT) quit_requested = true;
-	if (quit_requested)
+	if (Amphora_ProcessEventLoop(e) == SDL_QUIT) engine_flags.quit_requested = true;
+	if (engine_flags.quit_requested)
 		return 1;
 
 	Amphora_ClearBG();

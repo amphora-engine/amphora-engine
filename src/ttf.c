@@ -164,7 +164,7 @@ void
 Amphora_FreeStringV1(AmphoraString *msg)
 {
 	if (!msg) return;
-	if (Amphora_IsEngineRunningV1() == false) return;
+	if (Amphora_IsEngineRunning() == false) return;
 
 	SDL_DestroyTexture(msg->texture);
 	Amphora_HeapFree(msg->text);

@@ -3,6 +3,6 @@
 
 #include "util.h"
 
-bool Amphora_IsEngineRunningV1(void);
+bool Amphora_IsEngineRunning(void);
 
 #endif /* AMPHORA_SYSTEM_H */

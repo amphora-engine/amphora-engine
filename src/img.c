@@ -294,7 +294,7 @@ int
 Amphora_FreeSpriteV1(AmphoraImage *spr)
 {
 	Amphora_ValidatePtrNotNull(spr, AMPHORA_STATUS_FAIL_UNDEFINED)
-	if (Amphora_IsEngineRunningV1() == false) return AMPHORA_STATUS_OK;
+	if (Amphora_IsEngineRunning() == false) return AMPHORA_STATUS_OK;
 
 	if (spr == Amphora_GetCameraTarget()) Amphora_SetCameraTargetV1(NULL);
 	if (spr->frameset_list) Amphora_HeapFree(spr->frameset_list);
