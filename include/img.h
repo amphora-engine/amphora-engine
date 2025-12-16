@@ -29,7 +29,7 @@ void Amphora_PlayOneshotV1(AmphoraImage *spr, const char *name, void (*callback)
 /* Set the delay between frames of a frameset animation */
 int Amphora_SetFramesetAnimationTimeV1(AmphoraImage *spr, const char *name, unsigned int delay);
 /* Change the draw order of a sprite */
-AmphoraImage *Amphora_ReorderSpriteV1(AmphoraImage *spr, int order);
+int Amphora_ReorderSpriteV1(AmphoraImage *spr, int order);
 /* Sets a sprite's absolute location */
 int Amphora_SetSpriteLocationV1(AmphoraImage *spr, float x, float y);
 /* Move a sprite by the supplied delta values */

@@ -185,7 +185,7 @@ Amphora_SetFramesetAnimationTimeV1(AmphoraImage *spr, const char *name, unsigned
 	return AMPHORA_STATUS_OK;
 }
 
-AmphoraImage *
+int
 Amphora_ReorderSpriteV1(AmphoraImage *spr, int order)
 {
 	struct render_list_node_t *new_node = Amphora_AddRenderListNode(order);
@@ -195,7 +195,7 @@ Amphora_ReorderSpriteV1(AmphoraImage *spr, int order)
 	{
 		Amphora_SetError(AMPHORA_STATUS_ALLOC_FAIL, "Failed to allocate render list node, not reordering\n");
 
-		return spr;
+		return AMPHORA_STATUS_ALLOC_FAIL;
 	}
 
 	new_node->type = AMPH_OBJ_SPR;
@@ -205,7 +205,7 @@ Amphora_ReorderSpriteV1(AmphoraImage *spr, int order)
 	old_node->garbage = true;
 	spr->render_list_node = new_node;
 
-	return spr;
+	return AMPHORA_STATUS_OK;
 }
 
 int

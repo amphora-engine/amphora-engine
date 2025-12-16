@@ -22,7 +22,7 @@ AMPHORA_FUNCTION_V1(int, AddFrameset, (AmphoraImage *spr, const char *name, cons
 AMPHORA_ROUTINE_V1(SetFrameset, (AmphoraImage *spr, const char *name), (spr, name));
 AMPHORA_ROUTINE_V1(PlayOneshot, (AmphoraImage *spr, const char *name, void (*callback)(void)), (spr, name, callback));
 AMPHORA_FUNCTION_V1(int, SetFramesetAnimationTime, (AmphoraImage *spr, const char *name, unsigned int delay), (spr, name, delay));
-AMPHORA_FUNCTION_V1(AmphoraImage *, ReorderSprite, (AmphoraImage *spr, int order), (spr, order));
+AMPHORA_FUNCTION_V1(int, ReorderSprite, (AmphoraImage *spr, int order), (spr, order));
 AMPHORA_FUNCTION_V1(int, SetSpriteLocation, (AmphoraImage *spr, float x, float y), (spr, x, y));
 AMPHORA_FUNCTION_V1(int, MoveSprite, (AmphoraImage *spr, float delta_x, float delta_y), (spr, delta_x, delta_y));
 AMPHORA_FUNCTION_V1(int, FlipSprite, (AmphoraImage *spr), (spr));
@@ -126,12 +126,12 @@ AMPHORA_FUNCTION_V1(size_t, GetNumCharactersDisplayed, (const AmphoraString *msg
 AMPHORA_FUNCTION_V1(const char *, GetStringText, (AmphoraString *msg), (msg));
 AMPHORA_FUNCTION_V1(char, GetStringCharAtIndex, (const AmphoraString *msg, int idx), (msg, idx));
 AMPHORA_FUNCTION_V1(Vector2, GetStringDimensions, (const AmphoraString *msg), (msg));
-AMPHORA_VFUNCTION_V1(AmphoraString *, UpdateStringText,
+AMPHORA_VFUNCTION_V1(int, UpdateStringText,
 	(AmphoraString *msg, const char *fmt, ...),
 	(AmphoraString *msg, const char *fmt, va_list args),
 	(msg, fmt, args));
-AMPHORA_FUNCTION_V1(AmphoraString *, UpdateStringCharsDisplayed, (AmphoraString *msg, size_t n), (msg, n));
-AMPHORA_FUNCTION_V1(AmphoraString *, UpdateStringPosition, (AmphoraString *msg, float x, float y), (msg, x, y));
+AMPHORA_ROUTINE_V1(UpdateStringCharsDisplayed, (AmphoraString *msg, size_t n), (msg, n));
+AMPHORA_ROUTINE_V1(UpdateStringPosition, (AmphoraString *msg, float x, float y), (msg, x, y));
 AMPHORA_ROUTINE_V1(FreeString, (AmphoraString *msg), (msg));
 AMPHORA_ROUTINE_V1(RenderString, (const AmphoraString *msg), (msg));
 

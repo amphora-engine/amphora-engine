@@ -27,11 +27,11 @@ char Amphora_GetStringCharAtIndexV1(const AmphoraString *msg, int idx);
 /* Get the dimensions of a rendered string */
 Vector2 Amphora_GetStringDimensionsV1(const AmphoraString *msg);
 /* Update the text in a string */
-AmphoraString *Amphora_UpdateStringTextV1(AmphoraString *msg, const char *fmt, va_list args);
+int Amphora_UpdateStringTextV1(AmphoraString *msg, const char *fmt, va_list args);
 /* Change the number of characters displayed in a string, 0 displays all characters */
-AmphoraString *Amphora_UpdateStringCharsDisplayedV1(AmphoraString *msg, size_t n);
+void Amphora_UpdateStringCharsDisplayedV1(AmphoraString *msg, size_t n);
 /* Move a string to a new position */
-AmphoraString *Amphora_UpdateStringPositionV1(AmphoraString *msg, float x, float y);
+void Amphora_UpdateStringPositionV1(AmphoraString *msg, float x, float y);
 /* Free a string */
 void Amphora_FreeStringV1(AmphoraString *msg);
 /* Display an AmphoraString on the screen */

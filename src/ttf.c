@@ -117,7 +117,7 @@ Amphora_GetStringDimensionsV1(const AmphoraString *msg)
 	return (Vector2){ (int)msg->rectangle.w, (int)msg->rectangle.h };
 }
 
-AmphoraString *
+int
 Amphora_UpdateStringTextV1(AmphoraString *msg, const char *fmt, va_list args)
 {
 	char text[4096];
@@ -130,37 +130,33 @@ Amphora_UpdateStringTextV1(AmphoraString *msg, const char *fmt, va_list args)
 	msg->text = Amphora_HeapStrdup(text);
 	if (!((msg->n_buff = Amphora_HeapRealloc(msg->n_buff, SDL_strlen(text) + 1, MEM_STRING))))
 	{
-		return NULL;
+		return AMPHORA_STATUS_ALLOC_FAIL;
 	}
 	if (!msg->text)
 	{
 		Amphora_SetError(AMPHORA_STATUS_ALLOC_FAIL, "Failed to set new string: %s", text);
-		return NULL;
+		return AMPHORA_STATUS_ALLOC_FAIL;
 	}
 	SDL_DestroyTexture(msg->texture);
 	msg->texture = Amphora_RenderStringToTexture(msg);
 
-	return msg;
+	return AMPHORA_STATUS_OK;
 }
 
-AmphoraString *
+void
 Amphora_UpdateStringCharsDisplayedV1(AmphoraString *msg, size_t n)
 {
 	if (n > msg->len) n = 0;
 	msg->n = n;
 	SDL_DestroyTexture(msg->texture);
 	msg->texture = Amphora_RenderStringToTexture(msg);
-
-	return msg;
 }
 
-AmphoraString *
+void
 Amphora_UpdateStringPositionV1(AmphoraString *msg, float x, float y)
 {
 	msg->rectangle.x = x;
 	msg->rectangle.y = y;
-
-	return msg;
 }
 
 void
