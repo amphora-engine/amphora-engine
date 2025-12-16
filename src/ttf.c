@@ -18,7 +18,7 @@ static const char **font_paths;
 static int font_count;
 
 AmphoraString *
-Amphora_CreateStringV1(const char *font_name, const int pt, const float x, const float y, const int order, const AmphoraColor color, const bool stationary, const char *fmt, va_list args)
+Amphora_CreateStringV1(const char *font_name, const int pt, const float x, const float y, const int order, const AmphoraColor color, const bool stationary, const bool transient, const char *fmt, va_list args)
 {
 	struct render_list_node_t *render_list_node = Amphora_AddRenderListNode(order);
 	struct amphora_message_t *msg;
@@ -57,6 +57,7 @@ Amphora_CreateStringV1(const char *font_name, const int pt, const float x, const
 	msg->color = initial_color;
 	msg->rectangle.x = x;
 	msg->rectangle.y = y;
+	msg->transient = transient;
 	msg->render_list_node = render_list_node;
 	render_list_node->type = AMPH_OBJ_TXT;
 	render_list_node->data = msg;
@@ -82,6 +83,8 @@ Amphora_HideStringV1(AmphoraString *msg)
 	if (msg == NULL) return;
 
 	msg->render_list_node->display = false;
+	if (msg->transient)
+		Amphora_FreeStringV1(msg);
 }
 
 size_t

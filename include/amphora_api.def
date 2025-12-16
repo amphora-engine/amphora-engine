@@ -14,8 +14,8 @@ AMPHORA_FUNCTION_V1(int, UnregisterEvent, (const char *name), (name));
 AMPHORA_FUNCTION_V1(Vector2f, GetSpritePosition, (const AmphoraImage *spr), (spr));
 AMPHORA_FUNCTION_V1(Vector2f, GetSpriteCenter, (const AmphoraImage *spr), (spr));
 AMPHORA_FUNCTION_V1(bool, IsSpriteFlipped, (const AmphoraImage *spr), (spr));
-AMPHORA_FUNCTION_V1(AmphoraImage *, CreateSprite, (const char *image_name, float x, float y, float scale, bool flip, bool stationary, int order),
-	(image_name, x, y, scale, flip, stationary, order));
+AMPHORA_FUNCTION_V1(AmphoraImage *, CreateSprite, (const char *image_name, float x, float y, float scale, bool flip, bool stationary, bool transient, int order),
+	(image_name, x, y, scale, flip, stationary, transient, order));
 AMPHORA_FUNCTION_V1(int, AddFrameset, (AmphoraImage *spr, const char *name, const char *override_img, int sx, int sy,
 	int w, int h, float off_x, float off_y, int num_frames, int delay),
 	(spr, name, override_img, sx, sy, w, h, off_x, off_y, num_frames, delay));
@@ -116,9 +116,9 @@ AMPHORA_FUNCTION_V1(int, ShowMapLayer, (const char *name, int t), (name, t));
 
 // Fonts
 AMPHORA_VFUNCTION_V1(AmphoraString *, CreateString,
-	(const char *font_name, int pt, float x, float y, int order, AmphoraColor color, bool stationary, const char *fmt, ...),
-	(const char *font_name, int pt, float x, float y, int order, AmphoraColor color, bool stationary, const char *fmt, va_list args),
-	(font_name, pt, x, y, order, color, stationary, fmt, args));
+	(const char *font_name, int pt, float x, float y, int order, AmphoraColor color, bool stationary, bool transient, const char *fmt, ...),
+	(const char *font_name, int pt, float x, float y, int order, AmphoraColor color, bool stationary, bool transient, const char *fmt, va_list args),
+	(font_name, pt, x, y, order, color, stationary, transient, fmt, args));
 AMPHORA_ROUTINE_V1(ShowString, (AmphoraString *msg), (msg));
 AMPHORA_ROUTINE_V1(HideString, (AmphoraString *msg), (msg));
 AMPHORA_FUNCTION_V1(size_t, GetStringLength, (const AmphoraString *msg), (msg));

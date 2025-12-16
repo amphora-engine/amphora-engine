@@ -51,6 +51,7 @@ Amphora_CreateSpriteV1(const char *image_name,
 			const float scale,
 			const bool flip,
 			const bool stationary,
+			const bool transient,
 			const int order)
 {
 	AmphoraImage *spr = NULL;
@@ -77,6 +78,7 @@ Amphora_CreateSpriteV1(const char *image_name,
 	spr->framesets = HT_NewTable();
 	spr->render_list_node = render_list_node;
 	spr->flip = flip;
+	spr->transient = transient;
 	render_list_node->type = AMPH_OBJ_SPR;
 	render_list_node->data = spr;
 	render_list_node->stationary = stationary;
@@ -264,6 +266,8 @@ Amphora_HideSpriteV1(AmphoraImage *spr)
 	Amphora_ValidatePtrNotNull(spr, AMPHORA_STATUS_FAIL_UNDEFINED)
 
 	spr->render_list_node->display = false;
+	if (spr->transient)
+		Amphora_FreeSpriteV1(spr);
 
 	return AMPHORA_STATUS_OK;
 }

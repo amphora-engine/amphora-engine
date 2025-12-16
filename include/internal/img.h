@@ -24,6 +24,7 @@ struct sprite_t {
 	SDL_Surface *surface;
 	SDL_Surface *surface_orig;
 	float scale;
+	bool transient : 1;
 	bool flip : 1;
 	bool rerender : 1;
 	HT_HashTable framesets;

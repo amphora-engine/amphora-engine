@@ -11,7 +11,7 @@
 extern "C" {
 #endif
 /* Create a string */
-AmphoraString *Amphora_CreateStringV1(const char *font_name, int pt, float x, float y, int order, AmphoraColor color, bool stationary, const char *fmt, va_list args);
+AmphoraString *Amphora_CreateStringV1(const char *font_name, int pt, float x, float y, int order, AmphoraColor color, bool stationary, bool transient, const char *fmt, va_list args);
 /* Display a hidden string */
 void Amphora_ShowStringV1(AmphoraString *msg);
 /* Hide a string */

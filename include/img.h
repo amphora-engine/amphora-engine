@@ -18,7 +18,7 @@ Vector2f Amphora_GetSpriteCenterV1(const AmphoraImage *spr);
 bool Amphora_IsSpriteFlippedV1(const AmphoraImage *spr);
 /* Allocate a sprite slot and initialize it with the supplied values */
 AmphoraImage *Amphora_CreateSpriteV1(const char *image_name, float x, float y, float scale,
-				   bool flip, bool stationary, int order);
+				   bool flip, bool stationary, bool transient, int order);
 /* Add a frameset to a sprite */
 int Amphora_AddFramesetV1(AmphoraImage *spr, const char *name, const char *override_img, int sx, int sy,
 			 int w, int h, float off_x, float off_y, int num_frames, int delay);
