@@ -23,6 +23,7 @@ typedef struct
 {
 	char *engine_version;
 	int api_version;
+	const unsigned int * (*GetFrameAddress)(void);
 	int (*StartEngine)(void);
 	void (*RegisterGameData)(const char *, const char *);
 	void (*RegisterWindowTitle)(const char *);

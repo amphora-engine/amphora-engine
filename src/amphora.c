@@ -143,6 +143,12 @@ Amphora_GetFPSV1(void)
 	return (int)framerate;
 }
 
+const unsigned int *
+Amphora_GetFrameAddress(void)
+{
+	return &frame_count;
+}
+
 unsigned int
 Amphora_GetTicksV1(void)
 {

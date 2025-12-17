@@ -4,5 +4,6 @@
 #include "util.h"
 
 bool Amphora_IsEngineRunning(void);
+const unsigned int *Amphora_GetFrameAddress(void);
 
 #endif /* AMPHORA_SYSTEM_H */

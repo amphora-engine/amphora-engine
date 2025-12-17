@@ -3,6 +3,7 @@
 
 #include "amphora.h"
 #include "amphora_api.h"
+#include "internal/system.h"
 
 static AmphoraStartup ast;
 static AmphoraAPI_V1 aapi_v1;
@@ -37,6 +38,7 @@ Amphora_Connect(void)
 		(void)snprintf(ast.engine_version, version_string_len, "%s-%s", ENGINE_SUFFIX, VERSION_STRING);
 
 	ast.api_version = AMPHORA_API_VERSION;
+	ast.GetFrameAddress = Amphora_GetFrameAddress;
 	ast.StartEngine = Amphora_StartEngine;
 	ast.RegisterGameData = Amphora_RegisterGameData;
 	ast.RegisterWindowTitle = Amphora_RegisterWindowTitle;
