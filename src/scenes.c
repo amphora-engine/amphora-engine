@@ -107,9 +107,9 @@ Amphora_InitScene(void)
 }
 
 void
-Amphora_UpdateScene(unsigned int frame_count)
+Amphora_UpdateScene(void)
 {
-	scene_structs[current_scene_idx].update_func(frame_count, Amphora_GetKeyActionState());
+	scene_structs[current_scene_idx].update_func();
 }
 
 void

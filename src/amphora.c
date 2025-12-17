@@ -176,7 +176,7 @@ Amphora_MainLoop(SDL_Event *e)
 	if (Amphora_IsSceneUpdateLocked() == false)
 	{
 		if (Amphora_ControllerConnected()) Amphora_HandleJoystick();
-		Amphora_UpdateScene(frame_count);
+		Amphora_UpdateScene();
 		Amphora_UpdateCamera();
 	}
 	Amphora_ProcessRenderList();

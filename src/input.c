@@ -241,12 +241,6 @@ Amphora_InitInput(void)
 	return 0;
 }
 
-struct input_state_t *
-Amphora_GetKeyActionState(void)
-{
-	return (struct input_state_t *)key_actions;
-}
-
 void
 Amphora_AddController(Sint32 idx)
 {
