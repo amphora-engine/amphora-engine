@@ -148,6 +148,7 @@ Amphora_InitHeap(void)
 		Amphora_DestroyHeap();
 		return AMPHORA_STATUS_ALLOC_FAIL;
 	}
+	heap_metadata[AMPHORA_NUM_MEM_BLOCKS - 1].category = MEM_META;
 	for (i = 0; i < AMPHORA_NUM_MEM_BLOCKS; i++)
 	{
 		heap_metadata[i].largest_free = sizeof(AmphoraMemBlock) - sizeof(struct amphora_mem_allocation_header_t);
