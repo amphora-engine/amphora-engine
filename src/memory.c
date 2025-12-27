@@ -404,11 +404,11 @@ Amphora_HeapFree(void *ptr)
 	if (header->free) return;
 
 	block = idx / sizeof(AmphoraMemBlock);
-	if (header->off_f > heap_metadata[block].largest_free) heap_metadata[block].largest_free = header->off_f;
+	if (header->off_f > heap_metadata[block].largest_free)
+		heap_metadata[block].largest_free = header->off_f;
 	header->free = 1;
 	if (--heap_metadata[block].allocations == 0)
 	{
-		heap_metadata[block].largest_free = sizeof(AmphoraMemBlock) - sizeof(struct amphora_mem_allocation_header_t);
 		heap_metadata[block].category = MEM_UNASSIGNED;
 		heap_metadata[block].corrupted = 0;
 	}
@@ -423,7 +423,8 @@ Amphora_HeapClearFrameHeap(void)
 uint32_t
 Amphora_HeapHousekeeping(uint32_t ms)
 {
-	static uint8_t blk = 0, blk_last_update = 0;
+	static uint8_t blk = 0;
+	static uint8_t blk_last_update = 0;
 	static struct amphora_mem_allocation_header_t *header = NULL;
 
 	struct amphora_mem_allocation_header_t *next_header;
@@ -437,8 +438,7 @@ Amphora_HeapHousekeeping(uint32_t ms)
 	while (SDL_GetTicks() - start_time < ms)
 	{
 		next_header = header + 1 + (header->off_f >> 3);
-		if (heap_metadata[blk].category == MEM_UNASSIGNED
-			|| (uintptr_t)next_header > (uintptr_t)amphora_heap[blk] + sizeof(AmphoraMemBlock) - sizeof(struct amphora_mem_allocation_header_t)
+		if ((uintptr_t)next_header >= (uintptr_t)amphora_heap[blk] + sizeof(AmphoraMemBlock) - sizeof(struct amphora_mem_allocation_header_t)
 			|| heap_metadata[blk].corrupted)
 		{
 			if (blk == blk_last_update - 1)
@@ -450,12 +450,6 @@ Amphora_HeapHousekeeping(uint32_t ms)
 			header = (struct amphora_mem_allocation_header_t *)&amphora_heap[blk][0];
 			continue;
 		}
-		/* Update largest_free */
-		if (header->free && header->off_f > heap_metadata[blk].largest_free)
-		{
-			heap_metadata[blk].largest_free = header->off_f;
-			blk_last_update = blk;
-		}
 		/* Coalesce free blocks */
 		if (header->free && next_header->free)
 		{
@@ -464,7 +458,6 @@ Amphora_HeapHousekeeping(uint32_t ms)
 			next_header = header + 1 + (header->off_f >> 3);
 			next_header->off_b = header->off_f + sizeof(struct amphora_mem_allocation_header_t);
 			blk_last_update = blk;
-			continue;
 		}
 		/* Remove zero-size headers */
 		if (next_header->off_f == 0)
@@ -473,7 +466,12 @@ Amphora_HeapHousekeeping(uint32_t ms)
 			next_header = header + 1 + (header->off_f >> 3);
 			next_header->off_b = header->off_f + sizeof(struct amphora_mem_allocation_header_t);
 			blk_last_update = blk;
-			continue;
+		}
+		/* Update largest_free */
+		if (header->free && header->off_f > heap_metadata[blk].largest_free)
+		{
+			heap_metadata[blk].largest_free = header->off_f;
+			blk_last_update = blk;
 		}
 		header = next_header;
 	}
