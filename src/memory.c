@@ -175,9 +175,6 @@ Amphora_DestroyHeap(void)
 void *
 Amphora_HeapAlloc(size_t size, AmphoraMemBlockCategory category)
 {
-	/*
-	 * TODO: Figure out why first blocks are getting weird off_b values
-	 */
 	uint8_t *addr;
 	uint8_t current_block;
 	int i = 0;
