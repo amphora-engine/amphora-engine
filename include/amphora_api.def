@@ -67,7 +67,7 @@ AMPHORA_ROUTINE_V1(FadeOutMusic, (int ms), (ms));
 // Particles
 AMPHORA_FUNCTION_V1(AmphoraEmitter *, CreateEmitter, (float x, float y, float w, float h, float start_x, float start_y,
 	int spread_x, int spread_y, int count, float p_w, float p_h, AmphoraColor color, bool stationary, int order,
-	void (*update_fn)(int, int, AmphoraParticle *, AmphoraParticleExt *, const AmphoraFRect *)),
+	void (*update_fn)(AmphoraParticle *, const AmphoraFRect *)),
 	(x, y, w, h, start_x, start_y, spread_x, spread_y, count, p_w, p_h, color, stationary, order, update_fn));
 AMPHORA_FUNCTION_V1(int, DestroyEmitter, (AmphoraEmitter *emitter), (emitter));
 

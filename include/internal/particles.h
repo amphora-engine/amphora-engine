@@ -6,17 +6,19 @@
 #include "../particles.h"
 #include "internal/render.h"
 
+#define PARTICLE_BUCKET_SIZE 64
+
 struct emitter_t {
 	enum amphora_object_type_e type;
 	AmphoraFRect rectangle;
 	SDL_Texture *texture;
-	AmphoraParticle *particles;
-	AmphoraParticleExt *particle_data;
+	AmphoraParticle **particles;
+	int buckets_count;
 	int particles_count;
 	SDL_Color initial_color;
 	SDL_FPoint start_position;
 	int spread_x, spread_y;
-	void (*update)(int, int, AmphoraParticle *, AmphoraParticleExt *, const AmphoraFRect *);
+	void (*update)(AmphoraParticle *, const AmphoraFRect *);
 	struct render_list_node_t *render_list_node;
 };
 
