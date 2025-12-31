@@ -89,7 +89,6 @@ Amphora_CreateSpriteV1(const char *image_name,
 int
 Amphora_AddFramesetV1(AmphoraImage *spr,
 			const char *name,
-			const char *override_img,
 			int sx,
 			int sy,
 			int w,
@@ -97,7 +96,8 @@ Amphora_AddFramesetV1(AmphoraImage *spr,
 			float off_x,
 			float off_y,
 			int num_frames,
-			int delay)
+			int delay,
+			const char *override_img)
 {
 	SDL_Texture *override = NULL;
 

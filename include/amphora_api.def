@@ -16,9 +16,9 @@ AMPHORA_FUNCTION_V1(Vector2f, GetSpriteCenter, (const AmphoraImage *spr), (spr))
 AMPHORA_FUNCTION_V1(bool, IsSpriteFlipped, (const AmphoraImage *spr), (spr));
 AMPHORA_FUNCTION_V1(AmphoraImage *, CreateSprite, (const char *image_name, float x, float y, float scale, bool flip, bool stationary, bool transient, int order),
 	(image_name, x, y, scale, flip, stationary, transient, order));
-AMPHORA_FUNCTION_V1(int, AddFrameset, (AmphoraImage *spr, const char *name, const char *override_img, int sx, int sy,
-	int w, int h, float off_x, float off_y, int num_frames, int delay),
-	(spr, name, override_img, sx, sy, w, h, off_x, off_y, num_frames, delay));
+AMPHORA_FUNCTION_V1(int, AddFrameset, (AmphoraImage *spr, const char *name, int sx, int sy,
+	int w, int h, float off_x, float off_y, int num_frames, int delay, const char *override_img),
+	(spr, name, sx, sy, w, h, off_x, off_y, num_frames, delay, override_img));
 AMPHORA_ROUTINE_V1(SetFrameset, (AmphoraImage *spr, const char *name), (spr, name));
 AMPHORA_ROUTINE_V1(PlayOneshot, (AmphoraImage *spr, const char *name, void (*callback)(void)), (spr, name, callback));
 AMPHORA_FUNCTION_V1(int, SetFramesetAnimationTime, (AmphoraImage *spr, const char *name, unsigned int delay), (spr, name, delay));
