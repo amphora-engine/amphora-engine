@@ -50,8 +50,8 @@ Amphora_CreateEmitterV1(float x,
 		goto fail_texture;
 	}
 	emitter->rectangle = (AmphoraFRect) { x, y, w, h };
-	buckets_count = count / PARTICLE_BUCKET_SIZE;
-	if (buckets_count * PARTICLE_BUCKET_SIZE < count) buckets_count++;
+	buckets_count = count / PARTICLE_GROUP_SIZE;
+	if (buckets_count * PARTICLE_GROUP_SIZE < count) buckets_count++;
 	if (!((emitter->particles = Amphora_HeapAlloc(buckets_count * sizeof(AmphoraParticle *), MEM_EMITTER))))
 	{
 		Amphora_SetError(AMPHORA_STATUS_ALLOC_FAIL, "Failed to allocate particles");
@@ -59,7 +59,7 @@ Amphora_CreateEmitterV1(float x,
 	}
 	for (i = 0; i < buckets_count; i++)
 	{
-		emitter->particles[i] = Amphora_HeapAlloc(PARTICLE_BUCKET_SIZE * sizeof(AmphoraParticle), MEM_EMITTER);
+		emitter->particles[i] = Amphora_HeapAlloc(PARTICLE_GROUP_SIZE * sizeof(AmphoraParticle), MEM_PARTICLE);
 		if (emitter->particles[i] == NULL)
 		{
 			Amphora_SetError(AMPHORA_STATUS_ALLOC_FAIL, "Failed to allocate particles");
@@ -82,9 +82,9 @@ Amphora_CreateEmitterV1(float x,
 
 	for (i = 0; i < buckets_count; i++)
 	{
-		for (j = 0; j < PARTICLE_BUCKET_SIZE; j++)
+		for (j = 0; j < PARTICLE_GROUP_SIZE; j++)
 		{
-			if (i * PARTICLE_BUCKET_SIZE + j > count) break;
+			if (i * PARTICLE_GROUP_SIZE + j > count) break;
 
 			position = Amphora_CalculateParticleStartPosition(start_x, start_y, spread_x, spread_y);
 			emitter->particles[i][j].x = position.x;
@@ -151,9 +151,9 @@ Amphora_UpdateAndRenderParticleEmitter(AmphoraEmitter *emitter)
 
 	for (i = 0; i < emitter->buckets_count; i++)
 	{
-		for (j = 0; j < PARTICLE_BUCKET_SIZE; j++)
+		for (j = 0; j < PARTICLE_GROUP_SIZE; j++)
 		{
-			if (i * PARTICLE_BUCKET_SIZE + j > emitter->particles_count) break;
+			if (i * PARTICLE_GROUP_SIZE + j > emitter->particles_count) break;
 
 			if (emitter->update) emitter->update(&emitter->particles[i][j], &emitter->rectangle);
 			if (emitter->particles[i][j].hidden) continue;

@@ -6,7 +6,19 @@
 #include "../particles.h"
 #include "internal/render.h"
 
-#define PARTICLE_BUCKET_SIZE 64
+#define PARTICLE_GROUP_SIZE 15
+
+/* The Rationale Behind 15:
+ *
+ * Given a memory pool size of 65536 bytes, a particle struct sizeof  48 bytes, and an allocation header size of 8 bytes;
+ * letting k = number of particle groups per block, n = particles per group, and m = dead space...
+ *
+ * If we assume a pool filled only with particles, we can model the dead space as follows:
+ * m = 65536 % (48n + 8)
+ *
+ * An n of 15 is the largest n that minimizes the value of m without consuming an entire pool,
+ * so it was chosen as our group size.
+ */
 
 struct emitter_t {
 	enum amphora_object_type_e type;
