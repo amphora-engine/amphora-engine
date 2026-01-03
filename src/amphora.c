@@ -6,6 +6,7 @@
 #include "internal/input.h"
 #include "internal/memory.h"
 #include "internal/mixer.h"
+#include "internal/particles.h"
 #include "internal/prefs.h"
 #include "internal/random.h"
 #include "internal/render.h"
@@ -100,6 +101,7 @@ Amphora_StartEngine(void)
 	Amphora_InitInput();
 	Amphora_LoadKeymapV1();
 	Amphora_InitSceneManager();
+	Amphora_InitParticleSystem();
 
 	engine_flags.engine_running = true;
 	framerate = (Uint32) Amphora_LoadFPS();

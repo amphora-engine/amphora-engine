@@ -5,11 +5,12 @@
 #include "internal/render.h"
 #include "internal/system.h"
 
-/*
- * Prototypes for private functions
- */
-
+/* Prototypes for private functions */
+ssize_t Amphora_CalculateOptimalGroupSize(void);
 SDL_FPoint Amphora_CalculateParticleStartPosition(float start_x, float start_y, int spread_x, int spread_y);
+
+/* File-scoped variables */
+static ssize_t particle_group_size;
 
 AmphoraEmitter *
 Amphora_CreateEmitterV1(float x,
@@ -32,7 +33,7 @@ Amphora_CreateEmitterV1(float x,
 	struct render_list_node_t *render_list_node = NULL;
 	SDL_FPoint position;
 	SDL_Color initial_color = { color.r, color.g, color.b, color.a };
-	int buckets_count;
+	ssize_t buckets_count;
 	int i, j;
 
 	if ((emitter = Amphora_HeapAlloc(sizeof(AmphoraEmitter), MEM_EMITTER)) == NULL)
@@ -50,8 +51,8 @@ Amphora_CreateEmitterV1(float x,
 		goto fail_texture;
 	}
 	emitter->rectangle = (AmphoraFRect) { x, y, w, h };
-	buckets_count = count / PARTICLE_GROUP_SIZE;
-	if (buckets_count * PARTICLE_GROUP_SIZE < count) buckets_count++;
+	buckets_count = count / particle_group_size;
+	if (buckets_count * particle_group_size < count) buckets_count++;
 	if (!((emitter->particles = Amphora_HeapAlloc(buckets_count * sizeof(AmphoraParticle *), MEM_EMITTER))))
 	{
 		Amphora_SetError(AMPHORA_STATUS_ALLOC_FAIL, "Failed to allocate particles");
@@ -59,7 +60,7 @@ Amphora_CreateEmitterV1(float x,
 	}
 	for (i = 0; i < buckets_count; i++)
 	{
-		emitter->particles[i] = Amphora_HeapAlloc(PARTICLE_GROUP_SIZE * sizeof(AmphoraParticle), MEM_PARTICLE);
+		emitter->particles[i] = Amphora_HeapAlloc(particle_group_size * sizeof(AmphoraParticle), MEM_PARTICLE);
 		if (emitter->particles[i] == NULL)
 		{
 			Amphora_SetError(AMPHORA_STATUS_ALLOC_FAIL, "Failed to allocate particles");
@@ -82,9 +83,9 @@ Amphora_CreateEmitterV1(float x,
 
 	for (i = 0; i < buckets_count; i++)
 	{
-		for (j = 0; j < PARTICLE_GROUP_SIZE; j++)
+		for (j = 0; j < particle_group_size; j++)
 		{
-			if (i * PARTICLE_GROUP_SIZE + j > count) break;
+			if (i * particle_group_size + j > count) break;
 
 			position = Amphora_CalculateParticleStartPosition(start_x, start_y, spread_x, spread_y);
 			emitter->particles[i][j].x = position.x;
@@ -136,6 +137,12 @@ Amphora_DestroyEmitterV1(AmphoraEmitter *emitter)
  */
 
 void
+Amphora_InitParticleSystem(void)
+{
+	particle_group_size = Amphora_CalculateOptimalGroupSize();
+}
+
+void
 Amphora_UpdateAndRenderParticleEmitter(AmphoraEmitter *emitter)
 {
 	SDL_Renderer *renderer = Amphora_GetRenderer();
@@ -151,9 +158,9 @@ Amphora_UpdateAndRenderParticleEmitter(AmphoraEmitter *emitter)
 
 	for (i = 0; i < emitter->buckets_count; i++)
 	{
-		for (j = 0; j < PARTICLE_GROUP_SIZE; j++)
+		for (j = 0; j < particle_group_size; j++)
 		{
-			if (i * PARTICLE_GROUP_SIZE + j > emitter->particles_count) break;
+			if (i * particle_group_size + j > emitter->particles_count) break;
 
 			if (emitter->update) emitter->update(&emitter->particles[i][j], &emitter->rectangle);
 			if (emitter->particles[i][j].hidden) continue;
@@ -193,6 +200,34 @@ Amphora_UpdateAndRenderParticleEmitter(AmphoraEmitter *emitter)
 /*
  * Private functions
  */
+
+ssize_t
+Amphora_CalculateOptimalGroupSize(void)
+{
+	ssize_t min = -1;
+	size_t n = 2; /* Particles per group */
+	size_t m; /* Dead space in a full pool */
+	size_t s; /* Total size of each allocation of a group of n particles */
+
+	while (true)
+	{
+		s = sizeof(AmphoraParticle) * n + sizeof(struct amphora_mem_allocation_header_t);
+		if (s > (AMPHORA_HEAP_SIZE >> 1) - sizeof(struct amphora_mem_allocation_header_t) * 2) break;
+
+		m = AMPHORA_HEAP_SIZE % s;
+
+		if (min == -1 || AMPHORA_HEAP_SIZE % (sizeof(AmphoraParticle) * min + sizeof(struct amphora_mem_allocation_header_t)) >= m)
+			min = (ssize_t)n;
+
+		n++;
+	}
+
+#ifdef DEBUG
+	SDL_Log("Optimal particle group size: %ld\n", min);
+#endif
+
+	return min;
+}
 
 SDL_FPoint
 Amphora_CalculateParticleStartPosition(float start_x, float start_y, int spread_x, int spread_y)
