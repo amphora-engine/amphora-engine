@@ -15,7 +15,7 @@ set(AMPHORA_ENGINE_VERSION_STRING "v0.3.0-alpha")
 
 project(amphora LANGUAGES C)
 
-set(CMAKE_C_STANDARD 17)
+set(CMAKE_C_STANDARD 99)
 
 add_compile_definitions(ENGINE_SUFFIX="${AMPHORA_ENGINE_SUFFIX}")
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
@@ -28,7 +28,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 	if(WIN32)
 		string(APPEND CMAKE_C_FLAGS " /W4 /WX")
 	else()
-		string(APPEND CMAKE_C_FLAGS " -Wall -Wpedantic -Wextra")
+		string(APPEND CMAKE_C_FLAGS " -Wall -Wpedantic -Wextra -Wdeclaration-after-statement")
 	endif()
 endif()
 

@@ -211,6 +211,12 @@ Amphora_LoadFPS(void)
 static SDL_GUID
 Amphora_GetUUID(void)
 {
+#ifdef _WIN32
+	GUID uuid_bytes;
+#elif __APPLE__
+	CFUUIDRef uuid_ref;
+	CFUUIDBytes uuid_bytes;
+#endif
 	char *path = Amphora_HeapStrdup(SDL_GetPrefPath(game_author, game_title));
 	SDL_RWops *rw;
 	char *file_contents;
@@ -247,17 +253,15 @@ Amphora_GetUUID(void)
 #ifdef DEBUG
 	SDL_Log("Generating new UUID...\n");
 #endif
-#ifdef WIN32
-	GUID uuid_bytes;
-
+#ifdef _WIN32
 	CoCreateGuid(&uuid_bytes);
 	SDL_memcpy(&guid.data[0], &uuid_bytes.Data1, sizeof(uuid_bytes.Data1));
 	SDL_memcpy(&guid.data[4], &uuid_bytes.Data2, sizeof(uuid_bytes.Data2));
 	SDL_memcpy(&guid.data[6], &uuid_bytes.Data3, sizeof(uuid_bytes.Data3));
 	SDL_memcpy(&guid.data[8], &uuid_bytes.Data4, sizeof(uuid_bytes.Data4));
 #elif __APPLE__
-	CFUUIDRef uuid_ref = CFUUIDCreate(NULL);
-	CFUUIDBytes uuid_bytes = CFUUIDGetUUIDBytes(uuid_ref);
+	uuid_ref = CFUUIDCreate(NULL);
+	uuid_bytes = CFUUIDGetUUIDBytes(uuid_ref);
 	CFRelease(uuid_ref);
 
 	SDL_memcpy(&guid.data, &uuid_bytes, sizeof(guid.data));
