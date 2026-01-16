@@ -12,16 +12,6 @@
 #define fixed SDL_WINDOW_SHOWN
 #define resizable SDL_WINDOW_RESIZABLE
 
-#ifndef bool
-#define bool SDL_bool
-#endif
-#ifndef true
-#define true SDL_TRUE
-#endif
-#ifndef false
-#define false SDL_FALSE
-#endif
-
 #ifdef __cplusplus
 extern "C" {
 #endif
