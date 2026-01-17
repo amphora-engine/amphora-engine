@@ -1,10 +1,11 @@
 #ifndef UNTITLED_PLATFORMER_IMG_H
 #define UNTITLED_PLATFORMER_IMG_H
 
+#include <stdbool.h>
+
 #include "SDL.h"
 #include "SDL_image.h"
 
-#include "util.h"
 #include "render.h"
 
 #ifdef __cplusplus

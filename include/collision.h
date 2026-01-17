@@ -1,10 +1,7 @@
 #ifndef AMPHORA_COLLISION_H
 #define AMPHORA_COLLISION_H
 
-#include "SDL.h"
-
-#include "render.h"
-#include "util.h"
+#include <stdbool.h>
 
 typedef struct amphora_collidable_t IAmphoraCollidable;
 

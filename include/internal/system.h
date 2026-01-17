@@ -1,7 +1,7 @@
 #ifndef AMPHORA_SYSTEM_H
 #define AMPHORA_SYSTEM_H
 
-#include "util.h"
+#include <stdbool.h>
 
 bool Amphora_IsEngineRunning(void);
 const unsigned int *Amphora_GetFrameAddress(void);

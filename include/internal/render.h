@@ -1,6 +1,8 @@
 #ifndef RENDER_INTERNAL_H
 #define RENDER_INTERNAL_H
 
+#include <stdbool.h>
+
 #include "../util.h"
 #include "../render.h"
 

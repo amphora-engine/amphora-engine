@@ -1,9 +1,9 @@
 #ifndef UNTITLED_PLATFORMER_RENDER_H
 #define UNTITLED_PLATFORMER_RENDER_H
 
-#include "SDL.h"
+#include <stdbool.h>
 
-#include "util.h"
+#include "SDL.h"
 
 typedef SDL_FPoint Vector2f;
 typedef SDL_FPoint Camera;
