@@ -1,3 +1,4 @@
+#include "internal/context.h"
 #include "internal/db.h"
 #include "internal/error.h"
 #include "internal/img.h"
@@ -10,19 +11,8 @@
 /* Prototypes for private functions */
 static void Amphora_ProcessJoystickState(SDL_GameControllerAxis ax, SDL_GameControllerAxis ay, Vector2f *js, bool *jactive);
 
-/* File-scoped variables */
-static Uint32 *key_actions;
-static SDL_GameController *controller;
-static const char **action_names;
-static int action_count;
-static SDL_Keycode *keys;
-static SDL_GameControllerButton *controller_buttons;
-static const char **controller_button_names;
-static SDL_Keycode pressed_key;
-static bool joystickl_active;
-static bool joystickr_active;
-static Vector2f joystickl_state;
-static Vector2f joystickr_state;
+static struct input_ctx init;
+static struct input_ctx *inst = &init;
 
 void
 Amphora_LoadKeymapV1(void)
@@ -36,31 +26,31 @@ Amphora_LoadKeymapV1(void)
 	int i;
 
 	/* Load the default keymap for any mappings that are missing */
-	for (i = 0; i < action_count; i++)
+	for (i = 0; i < inst->action_count; i++)
 	{
 		(void)sqlite3_prepare_v2(db, sql_write, sql_write_len, &stmt, NULL);
 		(void)sqlite3_bind_int(stmt, 1, i);
-		(void)sqlite3_bind_text(stmt, 2, action_names[i], -1, NULL);
-		(void)sqlite3_bind_int(stmt, 3, keys[i]);
-		(void)sqlite3_bind_text(stmt, 4, SDL_GetKeyName(keys[i]), -1, NULL);
-		(void)sqlite3_bind_int(stmt, 5, controller_buttons[i]);
-		(void)sqlite3_bind_text(stmt, 6, controller_button_names[i], -1, NULL);
+		(void)sqlite3_bind_text(stmt, 2, inst->action_names[i], -1, NULL);
+		(void)sqlite3_bind_int(stmt, 3, inst->keys[i]);
+		(void)sqlite3_bind_text(stmt, 4, SDL_GetKeyName(inst->keys[i]), -1, NULL);
+		(void)sqlite3_bind_int(stmt, 5, inst->controller_buttons[i]);
+		(void)sqlite3_bind_text(stmt, 6, inst->controller_button_names[i], -1, NULL);
 		(void)sqlite3_step(stmt);
 		if (sqlite3_finalize(stmt) != SQLITE_OK)
-			SDL_Log("Failed to write action %s to database\n", action_names[i]);
+			SDL_Log("Failed to write action %s to database\n", inst->action_names[i]);
 	}
 
 	(void)sqlite3_prepare_v2(db, sql_read, (int)SDL_strlen(sql_read), &stmt, NULL);
-	for (i = 0; i < action_count; i++)
+	for (i = 0; i < inst->action_count; i++)
 	{
 		if (sqlite3_step(stmt) != SQLITE_ROW)
 		{
-			SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Failed to read keymap for action: %s\n", action_names[i]);
+			SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Failed to read keymap for action: %s\n", inst->action_names[i]);
 			(void)sqlite3_finalize(stmt);
 			continue;
 		}
-		keys[i] = sqlite3_column_int(stmt, 0);
-		controller_buttons[i] = sqlite3_column_int(stmt, 1);
+		inst->keys[i] = sqlite3_column_int(stmt, 0);
+		inst->controller_buttons[i] = sqlite3_column_int(stmt, 1);
 	}
 	(void)sqlite3_finalize(stmt);
 }
@@ -145,31 +135,31 @@ Amphora_ObjectHoverV1(void *obj)
 SDL_Keycode
 Amphora_GetPressedKeyV1(void)
 {
-	return pressed_key;
+	return inst->pressed_key;
 }
 
 bool
 Amphora_LeftJoystickActiveV1(void)
 {
-	return joystickl_active;
+	return inst->joystickl_active;
 }
 
 bool
 Amphora_RightJoystickActiveV1(void)
 {
-	return joystickr_active;
+	return inst->joystickr_active;
 }
 
 Vector2f
 Amphora_GetLeftJoystickStateV1(void)
 {
-	return joystickl_state;
+	return inst->joystickl_state;
 }
 
 Vector2f
 Amphora_GetRightJoystickStateV1(void)
 {
-	return joystickr_state;
+	return inst->joystickr_state;
 }
 
 const char *
@@ -207,9 +197,9 @@ Amphora_ForEachActionV1(void (*callback)(const char *, int))
 
 	if (!callback) return;
 
-	for (i = 0; i < action_count; i++)
+	for (i = 0; i < inst->action_count; i++)
 	{
-		callback(action_names[i], i);
+		callback(inst->action_names[i], i);
 	}
 }
 
@@ -244,21 +234,21 @@ Amphora_InitInput(void)
 void
 Amphora_AddController(Sint32 idx)
 {
-	if (controller) return;
+	if (inst->controller) return;
 
-	controller = SDL_GameControllerOpen(idx);
+	inst->controller = SDL_GameControllerOpen(idx);
 #ifdef DEBUG
-	SDL_Log("Connected controller %d\n", SDL_JoystickInstanceID(SDL_GameControllerGetJoystick(controller)));
+	SDL_Log("Connected controller %d\n", SDL_JoystickInstanceID(SDL_GameControllerGetJoystick(inst->controller)));
 #endif
 }
 
 void
 Amphora_RemoveController(SDL_JoystickID id)
 {
-	if (id != SDL_JoystickInstanceID(SDL_GameControllerGetJoystick(controller))) return;
+	if (id != SDL_JoystickInstanceID(SDL_GameControllerGetJoystick(inst->controller))) return;
 
-	SDL_GameControllerClose(controller);
-	controller = NULL;
+	SDL_GameControllerClose(inst->controller);
+	inst->controller = NULL;
 #ifdef DEBUG
 	SDL_Log("Disconnected controller %d\n", id);
 #endif
@@ -267,14 +257,14 @@ Amphora_RemoveController(SDL_JoystickID id)
 void
 Amphora_ReleaseControllers(void)
 {
-	SDL_GameControllerClose(controller);
-	controller = NULL;
+	SDL_GameControllerClose(inst->controller);
+	inst->controller = NULL;
 }
 
 bool
 Amphora_ControllerConnected(void)
 {
-	return controller != NULL;
+	return inst->controller != NULL;
 }
 
 void
@@ -282,12 +272,12 @@ Amphora_HandleKeyDown(const SDL_Event *e)
 {
 	int i;
 
-	pressed_key = e->key.keysym.sym;
-	for (i = 0; i < action_count; i++)
+	inst->pressed_key = e->key.keysym.sym;
+	for (i = 0; i < inst->action_count; i++)
 	{
-		if (e->key.keysym.sym == keys[i])
+		if (e->key.keysym.sym == inst->keys[i])
 		{
-			*key_actions |= (1LL << i);
+			*inst->key_actions |= (1LL << i);
 			return;
 		}
 	}
@@ -298,12 +288,12 @@ Amphora_HandleKeyUp(const SDL_Event *e)
 {
 	int i;
 
-	if (pressed_key == e->key.keysym.sym) pressed_key = 0;
-	for (i = 0; i < action_count; i++)
+	if (inst->pressed_key == e->key.keysym.sym) inst->pressed_key = 0;
+	for (i = 0; i < inst->action_count; i++)
 	{
-		if (e->key.keysym.sym == keys[i])
+		if (e->key.keysym.sym == inst->keys[i])
 		{
-			*key_actions &= ~(1LL << i);
+			*inst->key_actions &= ~(1LL << i);
 			return;
 		}
 	}
@@ -314,11 +304,11 @@ Amphora_HandleGamepadDown(const SDL_Event *e)
 {
 	int i;
 
-	for (i = 0; i < action_count; i++)
+	for (i = 0; i < inst->action_count; i++)
 	{
-		if (e->cbutton.button == controller_buttons[i])
+		if (e->cbutton.button == inst->controller_buttons[i])
 		{
-			*key_actions |= (1LL << i);
+			*inst->key_actions |= (1LL << i);
 			return;
 		}
 	}
@@ -329,11 +319,11 @@ Amphora_HandleGamepadUp(const SDL_Event *e)
 {
 	int i;
 
-	for (i = 0; i < action_count; i++)
+	for (i = 0; i < inst->action_count; i++)
 	{
-		if (e->cbutton.button == controller_buttons[i])
+		if (e->cbutton.button == inst->controller_buttons[i])
 		{
-			*key_actions &= ~(1LL << i);
+			*inst->key_actions &= ~(1LL << i);
 			return;
 		}
 	}
@@ -343,9 +333,9 @@ void
 Amphora_HandleJoystick(void)
 {
 	Amphora_ProcessJoystickState(SDL_CONTROLLER_AXIS_LEFTX, SDL_CONTROLLER_AXIS_LEFTY,
-				     &joystickl_state, &joystickl_active);
+				     &inst->joystickl_state, &inst->joystickl_active);
 	Amphora_ProcessJoystickState(SDL_CONTROLLER_AXIS_RIGHTX, SDL_CONTROLLER_AXIS_RIGHTY,
-				     &joystickr_state, &joystickr_active);
+				     &inst->joystickr_state, &inst->joystickr_active);
 }
 
 /*
@@ -363,8 +353,8 @@ Amphora_ProcessJoystickState(SDL_GameControllerAxis ax, SDL_GameControllerAxis a
 	Sint16 raw_x;
 	Sint16 raw_y;
 
-	raw_x = SDL_GameControllerGetAxis(controller, ax);
-	raw_y = SDL_GameControllerGetAxis(controller, ay);
+	raw_x = SDL_GameControllerGetAxis(inst->controller, ax);
+	raw_y = SDL_GameControllerGetAxis(inst->controller, ay);
 	x = raw_x < 0 ? (float)raw_x / 32768.0f : (float)raw_x / 32767.0f;
 	y = raw_y < 0 ? (float)raw_y / 32768.0f : (float)raw_y / 32767.0f;
 	magnitude = SDL_sqrtf(x * x + y * y);
@@ -389,10 +379,10 @@ Amphora_ProcessJoystickState(SDL_GameControllerAxis ax, SDL_GameControllerAxis a
 void
 Amphora_RegisterActionData(unsigned int *key_state, const char **actions, SDL_Keycode *keyboard_names, SDL_GameControllerButton *gamepad_buttons, const char **gamepad_button_names, int count)
 {
-	key_actions = key_state;
-	action_names = actions;
-	keys = keyboard_names;
-	controller_buttons = gamepad_buttons;
-	controller_button_names = gamepad_button_names;
-	action_count = count;
+	init.key_actions = key_state;
+	init.action_names = actions;
+	init.keys = keyboard_names;
+	init.controller_buttons = gamepad_buttons;
+	init.controller_button_names = gamepad_button_names;
+	init.action_count = count;
 }

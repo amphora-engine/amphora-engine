@@ -1,4 +1,5 @@
 #include "util.h"
+#include "internal/context.h"
 #include "internal/db.h"
 #include "internal/error.h"
 #include "internal/events.h"
@@ -22,14 +23,8 @@ static int Amphora_MainLoop(SDL_Event *e);
 static void Amphora_SaveConfig(void);
 static void Amphora_CleanResources(void);
 
-/* File-scored variables */
-static Uint32 frame_count = 0;
-static Uint32 framerate;
-static struct
-{
-	bool quit_requested : 1;
-	bool engine_running : 1;
-} engine_flags;
+static struct amphora_ctx init;
+static struct amphora_ctx *inst = &init;
 
 int
 Amphora_StartEngine(void)
@@ -103,8 +98,8 @@ Amphora_StartEngine(void)
 	Amphora_InitSceneManager();
 	Amphora_InitParticleSystem();
 
-	engine_flags.engine_running = true;
-	framerate = (Uint32) Amphora_LoadFPS();
+	inst->engine_flags.engine_running = true;
+	inst->framerate = (uint32_t)Amphora_LoadFPS();
 
 	Amphora_InitScene();
 
@@ -116,7 +111,7 @@ Amphora_StartEngine(void)
 	Mix_Quit();
 	TTF_Quit();
 	SDL_Quit();
-	engine_flags.engine_running = false;
+	inst->engine_flags.engine_running = false;
 
 	return AMPHORA_STATUS_OK;
 }
@@ -124,31 +119,31 @@ Amphora_StartEngine(void)
 bool
 Amphora_IsEngineRunning(void)
 {
-	return engine_flags.engine_running;
+	return inst->engine_flags.engine_running;
 }
 
 void
 Amphora_QuitGameV1(void)
 {
-	engine_flags.quit_requested = true;
+	inst->engine_flags.quit_requested = true;
 }
 
 unsigned int
 Amphora_GetFrameV1(void)
 {
-	return frame_count;
+	return inst->frame_count;
 }
 
 int
 Amphora_GetFPSV1(void)
 {
-	return (int)framerate;
+	return (int)inst->framerate;
 }
 
 const unsigned int *
 Amphora_GetFrameAddress(void)
 {
-	return &frame_count;
+	return &inst->frame_count;
 }
 
 unsigned int
@@ -170,10 +165,10 @@ Amphora_MainLoop(SDL_Event *e)
 	Uint32 remaining_time;
 
 	frame_start = SDL_GetTicks();
-	frame_count++;
+	inst->frame_count++;
 
-	if (Amphora_ProcessEventLoop(e) == SDL_QUIT) engine_flags.quit_requested = true;
-	if (engine_flags.quit_requested)
+	if (Amphora_ProcessEventLoop(e) == SDL_QUIT) inst->engine_flags.quit_requested = true;
+	if (inst->engine_flags.quit_requested)
 		return 1;
 
 	Amphora_ClearBG();
@@ -191,16 +186,16 @@ Amphora_MainLoop(SDL_Event *e)
 
 	frame_end = SDL_GetTicks();
 	frame_time = frame_end - frame_start;
-	if (frame_time < 1000 / framerate)
+	if (frame_time < 1000 / inst->framerate)
 	{
-		remaining_time = 1000 / framerate - frame_time;
+		remaining_time = 1000 / inst->framerate - frame_time;
 		remaining_time = Amphora_HeapHousekeeping(remaining_time);
 		SDL_Delay(remaining_time);
 #ifdef DEBUG
 	}
-	else if (frame_time > 1000 / framerate)
+	else if (frame_time > 1000 / inst->framerate)
 	{
-		SDL_Log("Lag on frame %u (frame took %u ticks, %d ticks per frame)\n", frame_count, frame_time, 1000 / framerate);
+		SDL_Log("Lag on frame %u (frame took %u ticks, %d ticks per frame)\n", inst->frame_count, frame_time, 1000 / inst->framerate);
 	}
 #else
 	}
@@ -224,7 +219,7 @@ Amphora_SaveConfig(void)
 		Amphora_SaveWinY(win_size.y);
 	}
 	Amphora_SaveWinFlags(win_flags);
-	Amphora_SaveFPS(framerate);
+	Amphora_SaveFPS(inst->framerate);
 }
 
 static void

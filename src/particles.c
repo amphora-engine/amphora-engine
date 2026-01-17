@@ -1,3 +1,4 @@
+#include "internal/context.h"
 #include "internal/error.h"
 #include "internal/memory.h"
 #include "internal/particles.h"
@@ -9,8 +10,8 @@
 ssize_t Amphora_CalculateOptimalGroupSize(void);
 SDL_FPoint Amphora_CalculateParticleStartPosition(float start_x, float start_y, int spread_x, int spread_y);
 
-/* File-scoped variables */
-static ssize_t particle_group_size;
+static struct particles_ctx init;
+static struct particles_ctx *inst = &init;
 
 AmphoraEmitter *
 Amphora_CreateEmitterV1(float x,
@@ -51,8 +52,8 @@ Amphora_CreateEmitterV1(float x,
 		goto fail_texture;
 	}
 	emitter->rectangle = (AmphoraFRect) { x, y, w, h };
-	buckets_count = count / particle_group_size;
-	if (buckets_count * particle_group_size < count) buckets_count++;
+	buckets_count = count / inst->particle_group_size;
+	if (buckets_count * inst->particle_group_size < count) buckets_count++;
 	if (!((emitter->particles = Amphora_HeapAlloc(buckets_count * sizeof(AmphoraParticle *), MEM_EMITTER))))
 	{
 		Amphora_SetError(AMPHORA_STATUS_ALLOC_FAIL, "Failed to allocate particles");
@@ -60,7 +61,7 @@ Amphora_CreateEmitterV1(float x,
 	}
 	for (i = 0; i < buckets_count; i++)
 	{
-		emitter->particles[i] = Amphora_HeapAlloc(particle_group_size * sizeof(AmphoraParticle), MEM_PARTICLE);
+		emitter->particles[i] = Amphora_HeapAlloc(inst->particle_group_size * sizeof(AmphoraParticle), MEM_PARTICLE);
 		if (emitter->particles[i] == NULL)
 		{
 			Amphora_SetError(AMPHORA_STATUS_ALLOC_FAIL, "Failed to allocate particles");
@@ -83,9 +84,9 @@ Amphora_CreateEmitterV1(float x,
 
 	for (i = 0; i < buckets_count; i++)
 	{
-		for (j = 0; j < particle_group_size; j++)
+		for (j = 0; j < inst->particle_group_size; j++)
 		{
-			if (i * particle_group_size + j > count) break;
+			if (i * inst->particle_group_size + j > count) break;
 
 			position = Amphora_CalculateParticleStartPosition(start_x, start_y, spread_x, spread_y);
 			emitter->particles[i][j].x = position.x;
@@ -139,7 +140,7 @@ Amphora_DestroyEmitterV1(AmphoraEmitter *emitter)
 void
 Amphora_InitParticleSystem(void)
 {
-	particle_group_size = Amphora_CalculateOptimalGroupSize();
+	init.particle_group_size = Amphora_CalculateOptimalGroupSize();
 }
 
 void
@@ -158,9 +159,9 @@ Amphora_UpdateAndRenderParticleEmitter(AmphoraEmitter *emitter)
 
 	for (i = 0; i < emitter->buckets_count; i++)
 	{
-		for (j = 0; j < particle_group_size; j++)
+		for (j = 0; j < inst->particle_group_size; j++)
 		{
-			if (i * particle_group_size + j > emitter->particles_count) break;
+			if (i * inst->particle_group_size + j > emitter->particles_count) break;
 
 			if (emitter->update) emitter->update(&emitter->particles[i][j], &emitter->rectangle);
 			if (emitter->particles[i][j].hidden) continue;

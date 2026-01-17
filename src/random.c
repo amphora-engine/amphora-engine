@@ -1,8 +1,10 @@
-#include "internal/random.h"
-
 #include <time.h>
 
-static Uint32 rand_state;
+#include "internal/context.h"
+#include "internal/random.h"
+
+static struct random_ctx init;
+static struct random_ctx *inst = &init;
 
 int
 Amphora_GetRandomV1(int n)
@@ -10,10 +12,10 @@ Amphora_GetRandomV1(int n)
 	if (n > UINT16_MAX) n = UINT16_MAX;
 	if (n <= 0) return 0;
 
-	rand_state ^= rand_state << 13;
-	rand_state ^= rand_state >> 17;
-	rand_state ^= rand_state << 5;
-	return (int)((rand_state >> 16) * n) >> 16;
+	inst->rand_state ^= inst->rand_state << 13;
+	inst->rand_state ^= inst->rand_state >> 17;
+	inst->rand_state ^= inst->rand_state << 5;
+	return (int)((inst->rand_state >> 16) * n) >> 16;
 }
 
 float
@@ -29,5 +31,5 @@ Amphora_GetRandomFV1(void)
 void
 Amphora_InitRand(void)
 {
-	rand_state = time(0);
+	init.rand_state = time(0);
 }

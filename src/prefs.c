@@ -6,6 +6,7 @@
 #include "uuid/uuid.h"
 #endif
 
+#include "internal/context.h"
 #include "internal/db.h"
 #include "internal/lib.h"
 #include "internal/memory.h"
@@ -14,14 +15,8 @@
 /* Prototypes for private functions */
 static SDL_GUID Amphora_GetUUID(void);
 
-/* File-scoped variables */
-static char uuid[33];
-const char *game_author;
-const char *game_title;
-static int window_x;
-static int window_y;
-static unsigned int window_flags;
-static int framerate;
+static struct prefs_ctx init;
+static struct prefs_ctx *inst = &init;
 
 /*
  * Internal functions
@@ -47,9 +42,9 @@ Amphora_InitConfig(void)
 		SDL_Log("%s\n", err_msg);
 		return -1;
 	}
-	SDL_GUIDToString(Amphora_GetUUID(), uuid, sizeof(uuid));
+	SDL_GUIDToString(Amphora_GetUUID(), init.uuid, sizeof(init.uuid));
 	sqlite3_prepare_v2(db, sql_create_row, (int)SDL_strlen(sql_create_row), &stmt, NULL);
-	sqlite3_bind_text(stmt, 1, uuid, -1, NULL);
+	sqlite3_bind_text(stmt, 1, init.uuid, -1, NULL);
 	sqlite3_step(stmt);
 	sqlite3_finalize(stmt);
 
@@ -65,7 +60,7 @@ Amphora_SaveWinX(int win_x)
 
 	sqlite3_prepare_v2(db, sql, (int)SDL_strlen(sql), &stmt, NULL);
 	sqlite3_bind_int64(stmt, 1, win_x);
-	sqlite3_bind_text(stmt, 2, uuid, -1, NULL);
+	sqlite3_bind_text(stmt, 2, inst->uuid, -1, NULL);
 	sqlite3_step(stmt);
 	sqlite3_finalize(stmt);
 
@@ -81,7 +76,7 @@ Amphora_SaveWinY(int win_y)
 
 	sqlite3_prepare_v2(db, sql, (int)SDL_strlen(sql), &stmt, NULL);
 	sqlite3_bind_int64(stmt, 1, win_y);
-	sqlite3_bind_text(stmt, 2, uuid, -1, NULL);
+	sqlite3_bind_text(stmt, 2, inst->uuid, -1, NULL);
 	sqlite3_step(stmt);
 	sqlite3_finalize(stmt);
 
@@ -97,7 +92,7 @@ Amphora_SaveWinFlags(Uint32 win_flags)
 
 	sqlite3_prepare_v2(db, sql, (int)SDL_strlen(sql), &stmt, NULL);
 	sqlite3_bind_int64(stmt, 1, (Sint64)win_flags);
-	sqlite3_bind_text(stmt, 2, uuid, -1, NULL);
+	sqlite3_bind_text(stmt, 2, inst->uuid, -1, NULL);
 	sqlite3_step(stmt);
 	sqlite3_finalize(stmt);
 
@@ -113,7 +108,7 @@ Amphora_SaveFPS(Uint32 fps)
 
 	sqlite3_prepare_v2(db, sql, (int)SDL_strlen(sql), &stmt, NULL);
 	sqlite3_bind_int64(stmt, 1, fps);
-	sqlite3_bind_text(stmt, 2, uuid, -1, NULL);
+	sqlite3_bind_text(stmt, 2, inst->uuid, -1, NULL);
 	sqlite3_step(stmt);
 	sqlite3_finalize(stmt);
 
@@ -129,16 +124,16 @@ Amphora_LoadWinX(void)
 	Sint32 val;
 
 	sqlite3_prepare_v2(db, sql, (int)SDL_strlen(sql), &stmt, NULL);
-	sqlite3_bind_text(stmt, 1, uuid, -1, NULL);
+	sqlite3_bind_text(stmt, 1, inst->uuid, -1, NULL);
 	if (sqlite3_step(stmt) != SQLITE_ROW)
 	{
 		sqlite3_finalize(stmt);
-		return window_x;
+		return inst->window_x;
 	}
 	val = (Sint32)sqlite3_column_int64(stmt, 0);
 	sqlite3_finalize(stmt);
 
-	return val ? val : window_x;
+	return val ? val : inst->window_x;
 }
 
 Sint32
@@ -150,16 +145,16 @@ Amphora_LoadWinY(void)
 	Sint32 val;
 
 	sqlite3_prepare_v2(db, sql, (int)SDL_strlen(sql), &stmt, NULL);
-	sqlite3_bind_text(stmt, 1, uuid, -1, NULL);
+	sqlite3_bind_text(stmt, 1, inst->uuid, -1, NULL);
 	if (sqlite3_step(stmt) != SQLITE_ROW)
 	{
 		sqlite3_finalize(stmt);
-		return window_y;
+		return inst->window_y;
 	}
 	val = (Sint32)sqlite3_column_int64(stmt, 0);
 	sqlite3_finalize(stmt);
 
-	return val ? val : window_y;
+	return val ? val : inst->window_y;
 }
 
 Uint32
@@ -171,16 +166,16 @@ Amphora_LoadWinFlags(void)
 	Sint32 val;
 
 	sqlite3_prepare_v2(db, sql, (int)SDL_strlen(sql), &stmt, NULL);
-	sqlite3_bind_text(stmt, 1, uuid, -1, NULL);
+	sqlite3_bind_text(stmt, 1, inst->uuid, -1, NULL);
 	if (sqlite3_step(stmt) != SQLITE_ROW)
 	{
 		sqlite3_finalize(stmt);
-		return window_flags;
+		return inst->window_flags;
 	}
 	val = (Sint32)sqlite3_column_int64(stmt, 0);
 	sqlite3_finalize(stmt);
 
-	return val ? (Uint32)val : window_flags;
+	return val ? (Uint32)val : inst->window_flags;
 }
 
 Sint32
@@ -192,16 +187,16 @@ Amphora_LoadFPS(void)
 	Sint32 val;
 
 	sqlite3_prepare_v2(db, sql, (int)SDL_strlen(sql), &stmt, NULL);
-	sqlite3_bind_text(stmt, 1, uuid, -1, NULL);
+	sqlite3_bind_text(stmt, 1, inst->uuid, -1, NULL);
 	if (sqlite3_step(stmt) != SQLITE_ROW)
 	{
 		sqlite3_finalize(stmt);
-		return framerate;
+		return inst->framerate;
 	}
 	val = (Sint32)sqlite3_column_int64(stmt, 0);
 	sqlite3_finalize(stmt);
 
-	return val ? val : framerate;
+	return val ? val : inst->framerate;
 }
 
 /*
@@ -217,7 +212,7 @@ Amphora_GetUUID(void)
 	CFUUIDRef uuid_ref;
 	CFUUIDBytes uuid_bytes;
 #endif
-	char *path = Amphora_HeapStrdup(SDL_GetPrefPath(game_author, game_title));
+	char *path = Amphora_HeapStrdup(SDL_GetPrefPath(inst->game_author, inst->game_title));
 	SDL_RWops *rw;
 	char *file_contents;
 	SDL_GUID guid;
@@ -289,10 +284,10 @@ Amphora_GetUUID(void)
 void
 Amphora_RegisterPrefs(const char *auth, const char *title, int win_x, int win_y, unsigned int win_flags, int fr)
 {
-	game_author = auth;
-	game_title = title;
-	window_x = win_x;
-	window_y = win_y;
-	window_flags = win_flags;
-	framerate = fr;
+	init.game_author = auth;
+	init.game_title = title;
+	init.window_x = win_x;
+	init.window_y = win_y;
+	init.window_flags = win_flags;
+	init.framerate = fr;
 }

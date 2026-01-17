@@ -1,3 +1,4 @@
+#include "internal/context.h"
 #include "internal/error.h"
 #include "internal/img.h"
 #include "internal/lib.h"
@@ -8,14 +9,8 @@
 /* Prototypes for private functions */
 static void Amphora_LoadIMGTexture(const char *name);
 
-/* File-scoped variables */
-static HT_HashTable images;
-static HT_HashTable image_surfaces;
-static HT_HashTable image_surfaces_orig;
-static HT_HashTable open_images;
-static const char **img_names;
-static const char **img_paths;
-static int img_count;
+static struct img_ctx init;
+static struct img_ctx *inst = &init;
 
 Vector2f
 Amphora_GetSpritePositionV1(const AmphoraImage *spr)
@@ -57,7 +52,7 @@ Amphora_CreateSpriteV1(const char *image_name,
 	AmphoraImage *spr = NULL;
 	struct render_list_node_t *render_list_node = NULL;
 
-	if (HT_GetValue(image_name, open_images) == -1)
+	if (HT_GetValue(image_name, inst->open_images) == -1)
 		Amphora_LoadIMGTexture(image_name);
 
 	if ((spr = Amphora_HeapCalloc(1, sizeof(AmphoraImage), MEM_IMAGE)) == NULL)
@@ -69,9 +64,9 @@ Amphora_CreateSpriteV1(const char *image_name,
 	render_list_node = Amphora_AddRenderListNode(order);
 
 	spr->type = AMPH_OBJ_SPR;
-	spr->image = HT_GetRef(image_name, SDL_Texture, open_images);
-	spr->surface = HT_GetRef(image_name, SDL_Surface, image_surfaces);
-	spr->surface_orig = HT_GetRef(image_name, SDL_Surface, image_surfaces_orig);
+	spr->image = HT_GetRef(image_name, SDL_Texture, inst->open_images);
+	spr->surface = HT_GetRef(image_name, SDL_Surface, inst->image_surfaces);
+	spr->surface_orig = HT_GetRef(image_name, SDL_Surface, inst->image_surfaces_orig);
 	spr->rectangle.x = x;
 	spr->rectangle.y = y;
 	spr->scale = scale;
@@ -114,10 +109,10 @@ Amphora_AddFramesetV1(AmphoraImage *spr,
 
 	if (override_img)
 	{
-		if (HT_GetValue(override_img, open_images) == -1)
+		if (HT_GetValue(override_img, inst->open_images) == -1)
 			Amphora_LoadIMGTexture(override_img);
 
-		override = HT_GetRef(override_img, SDL_Texture, open_images);
+		override = HT_GetRef(override_img, SDL_Texture, inst->open_images);
 	}
 
 	spr->frameset_list[spr->num_framesets] = (struct frameset_t){
@@ -318,16 +313,16 @@ Amphora_InitIMG(void)
 {
 	int i;
 
-	images = HT_NewTable();
-	open_images = HT_NewTable();
-	image_surfaces = HT_NewTable();
-	image_surfaces_orig = HT_NewTable();
+	init.images = HT_NewTable();
+	init.open_images = HT_NewTable();
+	init.image_surfaces = HT_NewTable();
+	init.image_surfaces_orig = HT_NewTable();
 
-	for (i = 0; i < img_count; i++)
+	for (i = 0; i < init.img_count; i++)
 	{
-		HT_StoreRef(img_names[i], img_paths[i], images);
+		HT_StoreRef(init.img_names[i], init.img_paths[i], init.images);
 #ifdef DEBUG
-		SDL_Log("Found image %s\n", img_names[i]);
+		SDL_Log("Found image %s\n", init.img_names[i]);
 #endif
 	}
 
@@ -339,22 +334,22 @@ Amphora_FreeAllIMG(void)
 {
 	int i;
 
-	for (i = 0; i < img_count; i++)
+	for (i = 0; i < inst->img_count; i++)
 	{
-		if (HT_GetValue(img_names[i], open_images) != -1)
+		if (HT_GetValue(inst->img_names[i], inst->open_images) != -1)
 		{
 #ifdef DEBUG
-			SDL_Log("Unloading image: %s\n", img_names[i]);
+			SDL_Log("Unloading image: %s\n", inst->img_names[i]);
 #endif
-			SDL_DestroyTexture(HT_GetRef(img_names[i], SDL_Texture, open_images));
-			SDL_FreeSurface(HT_GetRef(img_names[i], SDL_Surface, image_surfaces));
-			SDL_FreeSurface(HT_GetRef(img_names[i], SDL_Surface, image_surfaces_orig));
-			(void)HT_SetValue(img_names[i], 0, open_images);
-			(void)HT_SetValue(img_names[i], 0, image_surfaces);
-			(void)HT_SetValue(img_names[i], 0, image_surfaces_orig);
-			HT_DeleteKey(img_names[i], open_images);
-			HT_DeleteKey(img_names[i], image_surfaces);
-			HT_DeleteKey(img_names[i], image_surfaces_orig);
+			SDL_DestroyTexture(HT_GetRef(inst->img_names[i], SDL_Texture, inst->open_images));
+			SDL_FreeSurface(HT_GetRef(inst->img_names[i], SDL_Surface, inst->image_surfaces));
+			SDL_FreeSurface(HT_GetRef(inst->img_names[i], SDL_Surface, inst->image_surfaces_orig));
+			(void)HT_SetValue(inst->img_names[i], 0, inst->open_images);
+			(void)HT_SetValue(inst->img_names[i], 0, inst->image_surfaces);
+			(void)HT_SetValue(inst->img_names[i], 0, inst->image_surfaces_orig);
+			HT_DeleteKey(inst->img_names[i], inst->open_images);
+			HT_DeleteKey(inst->img_names[i], inst->image_surfaces);
+			HT_DeleteKey(inst->img_names[i], inst->image_surfaces_orig);
 		}
 	}
 }
@@ -362,19 +357,19 @@ Amphora_FreeAllIMG(void)
 void
 Amphora_CloseIMG(void)
 {
-	HT_FreeTable(images);
-	HT_FreeTable(open_images);
-	HT_FreeTable(image_surfaces);
-	HT_FreeTable(image_surfaces_orig);
+	HT_FreeTable(inst->images);
+	HT_FreeTable(inst->open_images);
+	HT_FreeTable(inst->image_surfaces);
+	HT_FreeTable(inst->image_surfaces_orig);
 }
 
 SDL_Texture *
 Amphora_GetIMGTextureByName(const char *name)
 {
-	if (HT_GetValue(name, open_images) == -1)
+	if (HT_GetValue(name, inst->open_images) == -1)
 		Amphora_LoadIMGTexture(name);
 
-	return HT_GetRef(name, SDL_Texture, open_images);
+	return HT_GetRef(name, SDL_Texture, inst->open_images);
 }
 
 void
@@ -459,12 +454,12 @@ Amphora_LoadIMGTexture(const char *name)
 #ifdef DEBUG
 	SDL_Log("Loading image: %s\n", name);
 #endif
-	img_rw = SDL_RWFromFile(HT_GetRef(name, char, images), "rb");
+	img_rw = SDL_RWFromFile(HT_GetRef(name, char, inst->images), "rb");
 	surface = IMG_Load_RW(img_rw, 1);
 	surface_orig = SDL_DuplicateSurface(surface);
-	HT_StoreRef(name, SDL_CreateTextureFromSurface(Amphora_GetRenderer(), surface), open_images);
-	HT_StoreRef(name, surface, image_surfaces);
-	HT_StoreRef(name, surface_orig, image_surfaces_orig);
+	HT_StoreRef(name, SDL_CreateTextureFromSurface(Amphora_GetRenderer(), surface), inst->open_images);
+	HT_StoreRef(name, surface, inst->image_surfaces);
+	HT_StoreRef(name, surface_orig, inst->image_surfaces_orig);
 }
 
 /*
@@ -474,7 +469,7 @@ Amphora_LoadIMGTexture(const char *name)
 void
 Amphora_RegisterImageData(const char **names, const char **paths, int count)
 {
-	img_names = names;
-	img_paths = paths;
-	img_count = count;
+	init.img_names = names;
+	init.img_paths = paths;
+	init.img_count = count;
 }

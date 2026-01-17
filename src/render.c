@@ -1,3 +1,4 @@
+#include "internal/context.h"
 #include "internal/error.h"
 #include "internal/img.h"
 #include "internal/memory.h"
@@ -10,59 +11,54 @@
 /* Prototypes for private functions */
 int Amphora_InitRenderList(void);
 
-/* File-scoped variables */
-static SDL_Renderer *renderer;
-static SDL_Window *window;
-static const char *window_title;
-static Camera camera = { 0, 0 };
-static enum camera_mode_e camera_mode = CAM_MANUAL;
-static SDL_Color bg = { 0, 0, 0, 0xff };
-static Vector2 render_logical_size = {0, 0 };
-static struct render_list_node_t *render_list;
-static struct render_list_node_t *render_list_head;
-static AmphoraImage *camera_target;
-static SDL_FRect camera_boundary;
-static Uint32 render_list_node_count;
+static struct render_ctx init =
+{
+	.camera = { 0, 0 },
+	.camera_mode = CAM_MANUAL,
+	.bg = { 0, 0, 0, 0xff },
+	.render_logical_size = { 0, 0 }
+};
+static struct render_ctx *inst = &init;
 
 Vector2
 Amphora_GetResolutionV1(void)
 {
 	Sint32 rx, ry;
-	SDL_GetWindowSize(window, &rx, &ry);
+	SDL_GetWindowSize(inst->window, &rx, &ry);
 	return (Vector2){rx, ry };
 }
 
 Vector2
 Amphora_GetRenderLogicalSizeV1(void)
 {
-	return render_logical_size;
+	return inst->render_logical_size;
 }
 
 Vector2f
 Amphora_GetCameraV1(void)
 {
-	return camera;
+	return inst->camera;
 }
 
 void
 Amphora_SetCameraV1(float x, float y)
 {
-	camera.x = x;
-	camera.y = y;
+	inst->camera.x = x;
+	inst->camera.y = y;
 }
 
 void
 Amphora_MoveCameraV1(float delta_x, float delta_y)
 {
-	camera.x += delta_x;
-	camera.y += delta_y;
+	inst->camera.x += delta_x;
+	inst->camera.y += delta_y;
 }
 
 void
 Amphora_SetCameraTargetV1(AmphoraImage *target)
 {
-	camera_mode = target ? CAM_TRACKING : CAM_MANUAL;
-	camera_target = target;
+	inst->camera_mode = target ? CAM_TRACKING : CAM_MANUAL;
+	inst->camera_target = target;
 }
 
 void
@@ -71,7 +67,7 @@ Amphora_BoundCameraToMapV1(void)
 	AmphoraFRect map_rect = *Amphora_GetMapRectangleV1();
 	SDL_FRect rect = { map_rect.x, map_rect.y, map_rect.w, map_rect.h };
 
-	SDL_memcpy(&camera_boundary, &rect, sizeof(camera_boundary));
+	SDL_memcpy(&inst->camera_boundary, &rect, sizeof(inst->camera_boundary));
 }
 
 void
@@ -79,13 +75,13 @@ Amphora_BoundCameraV1(const AmphoraFRect *boundary)
 {
 	SDL_FRect rect = { boundary->x, boundary->y, boundary->w, boundary->h };
 
-	SDL_memcpy(&camera_boundary, &rect, sizeof(camera_boundary));
+	SDL_memcpy(&inst->camera_boundary, &rect, sizeof(inst->camera_boundary));
 }
 
 void
 Amphora_UnboundCameraV1(void)
 {
-	SDL_memset(&camera_boundary, 0, sizeof(camera_boundary));
+	SDL_memset(&inst->camera_boundary, 0, sizeof(inst->camera_boundary));
 }
 
 void
@@ -120,8 +116,8 @@ Amphora_SetCameraZoomV1(int factor, int delay)
 		for (i = 0; i < scale_steps_count; i++)
 		{
 			scale_steps[i] = (Vector2){
-				.x = render_logical_size.x - (step_size.x * (i + 1)),
-				.y = render_logical_size.y - (step_size.y * (i + 1))
+				.x = inst->render_logical_size.x - (step_size.x * (i + 1)),
+				.y = inst->render_logical_size.y - (step_size.y * (i + 1))
 			};
 		}
 	}
@@ -150,7 +146,7 @@ Amphora_ResetCameraZoomV1(int delay)
 AmphoraColor
 Amphora_GetBGColorV1(void)
 {
-	AmphoraColor abg = { .r = bg.r, .g = bg.g, .b = bg.b, .a = bg.a};
+	AmphoraColor abg = { .r = inst->bg.r, .g = inst->bg.g, .b = inst->bg.b, .a = inst->bg.a};
 
 	return abg;
 }
@@ -158,28 +154,28 @@ Amphora_GetBGColorV1(void)
 void
 Amphora_SetBGColorV1(AmphoraColor color)
 {
-	bg.r = color.r;
-	bg.g = color.g;
-	bg.b = color.b;
-	bg.a = 0xff;
+	inst->bg.r = color.r;
+	inst->bg.g = color.g;
+	inst->bg.b = color.b;
+	inst->bg.a = 0xff;
 }
 
 void
 Amphora_SetWindowFullscreenV1(void)
 {
-	SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+	SDL_SetWindowFullscreen(inst->window, SDL_WINDOW_FULLSCREEN_DESKTOP);
 }
 
 void
 Amphora_SetWindowWindowedV1(void)
 {
-	SDL_SetWindowFullscreen(window, 0);
+	SDL_SetWindowFullscreen(inst->window, 0);
 }
 
 bool
 Amphora_IsWindowFullscreenV1(void)
 {
-	return SDL_GetWindowFlags(window) & SDL_WINDOW_FULLSCREEN_DESKTOP;
+	return SDL_GetWindowFlags(inst->window) & SDL_WINDOW_FULLSCREEN_DESKTOP;
 }
 
 /*
@@ -189,14 +185,14 @@ Amphora_IsWindowFullscreenV1(void)
 int
 Amphora_InitRender(void)
 {
-	if (!((window = SDL_CreateWindow(window_title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+	if (!((init.window = SDL_CreateWindow(init.window_title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
 					 (int) Amphora_LoadWinX(), (int) Amphora_LoadWinY(), (Uint32) Amphora_LoadWinFlags()))))
 	{
 		SDL_LogError(SDL_LOG_CATEGORY_RENDER, "Failed to create window: %s\n", SDL_GetError());
 		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Failed to create window", SDL_GetError(), 0);
 		return -1;
 	}
-	if (!((renderer = SDL_CreateRenderer(window, -1, 0))))
+	if (!((init.renderer = SDL_CreateRenderer(init.window, -1, 0))))
 	{
 		SDL_LogError(SDL_LOG_CATEGORY_RENDER, "Failed to create renderer: %s\n", SDL_GetError());
 		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Failed to create renderer", SDL_GetError(), 0);
@@ -216,40 +212,40 @@ Amphora_InitRender(void)
 void
 Amphora_CloseRender(void)
 {
-	SDL_DestroyRenderer(renderer);
-	SDL_DestroyWindow(window);
+	SDL_DestroyRenderer(init.renderer);
+	SDL_DestroyWindow(init.window);
 }
 
 void
 Amphora_SetRenderLogicalSize(Vector2 size)
 {
-	render_logical_size = size;
-	SDL_RenderSetLogicalSize(renderer, (int)render_logical_size.x, (int)render_logical_size.y);
+	inst->render_logical_size = size;
+	SDL_RenderSetLogicalSize(inst->renderer, (int)inst->render_logical_size.x, (int)inst->render_logical_size.y);
 }
 
 void
 Amphora_ClearBG(void)
 {
-	SDL_SetRenderDrawColor(renderer, bg.r, bg.g, bg.b, bg.a);
-	SDL_RenderClear(renderer);
+	SDL_SetRenderDrawColor(inst->renderer, inst->bg.r, inst->bg.g, inst->bg.b, inst->bg.a);
+	SDL_RenderClear(inst->renderer);
 }
 
 SDL_Window *
 Amphora_GetWindow(void)
 {
-	return window;
+	return inst->window;
 }
 
 SDL_Renderer *
 Amphora_GetRenderer(void)
 {
-	return renderer;
+	return inst->renderer;
 }
 
 AmphoraImage *
 Amphora_GetCameraTarget(void)
 {
-	return camera_target;
+	return inst->camera_target;
 }
 
 struct render_list_node_t *
@@ -257,7 +253,7 @@ Amphora_AddRenderListNode(int order)
 {
 	struct render_list_node_t *new_render_list_node = NULL;
 
-	if (!render_list) Amphora_InitRenderList();
+	if (!inst->render_list) Amphora_InitRenderList();
 
 	if ((new_render_list_node = Amphora_HeapCalloc(1, sizeof(struct render_list_node_t), MEM_RENDERABLE)) == NULL)
 	{
@@ -267,24 +263,24 @@ Amphora_AddRenderListNode(int order)
 	}
 	while (1)
 	{
-		if (render_list->next == NULL)
+		if (inst->render_list->next == NULL)
 		{
 			new_render_list_node->next = NULL;
-			render_list->next = new_render_list_node;
+			inst->render_list->next = new_render_list_node;
 			break;
 		}
-		if (render_list->next->order > order)
+		if (inst->render_list->next->order > order)
 		{
-			new_render_list_node->next = render_list->next;
-			render_list->next = new_render_list_node;
+			new_render_list_node->next = inst->render_list->next;
+			inst->render_list->next = new_render_list_node;
 			break;
 		}
-		render_list = render_list->next;
+		inst->render_list = inst->render_list->next;
 	}
 	new_render_list_node->order = order;
 	new_render_list_node->display = true;
-	render_list = render_list_head;
-	render_list_node_count++;
+	inst->render_list = inst->render_list_head;
+	inst->render_list_node_count++;
 
 	return new_render_list_node;
 }
@@ -296,61 +292,61 @@ Amphora_ProcessRenderList(void)
 	AmphoraFRect map_rect;
 	SDL_FRect rect;
 
-	while(render_list)
+	while(inst->render_list)
 	{
-		while (render_list->next && render_list->next->garbage)
+		while (inst->render_list->next && inst->render_list->next->garbage)
 		{
-			garbage = render_list->next;
-			render_list->next = render_list->next->next;
+			garbage = inst->render_list->next;
+			inst->render_list->next = inst->render_list->next->next;
 			Amphora_HeapFree(garbage);
-			render_list_node_count--;
+			inst->render_list_node_count--;
 		}
-		if (!render_list->display)
+		if (!inst->render_list->display)
 		{
-			render_list = render_list->next;
+			inst->render_list = inst->render_list->next;
 			continue;
 		}
-		switch (render_list->type)
+		switch (inst->render_list->type)
 		{
 			case AMPH_OBJ_SPR:
-				Amphora_UpdateAndDrawSprite(render_list->data);
+				Amphora_UpdateAndDrawSprite(inst->render_list->data);
 				break;
 			case AMPH_OBJ_TXT:
-				Amphora_RenderStringV1(render_list->data);
+				Amphora_RenderStringV1(inst->render_list->data);
 				break;
 			case AMPH_OBJ_MAP:
 				map_rect = *Amphora_GetMapRectangleV1();
-				map_rect.x = -camera.x;
-				map_rect.y = -camera.y;
+				map_rect.x = -inst->camera.x;
+				map_rect.y = -inst->camera.y;
 				rect = (SDL_FRect){ map_rect.x, map_rect.y, map_rect.w, map_rect.h };
-				Amphora_RenderTexture(render_list->data, NULL, &rect, 0,
+				Amphora_RenderTexture(inst->render_list->data, NULL, &rect, 0,
 						      SDL_FLIP_NONE);
 				break;
 			case AMPH_OBJ_EMITTER:
-				Amphora_UpdateAndRenderParticleEmitter(render_list->data);
+				Amphora_UpdateAndRenderParticleEmitter(inst->render_list->data);
 				break;
 			default:
 				break;
 		}
 
-		render_list = render_list->next;
+		inst->render_list = inst->render_list->next;
 	}
 
-	render_list = render_list_head;
+	inst->render_list = inst->render_list_head;
 }
 
 void
 Amphora_FreeRenderList(void)
 {
-	struct render_list_node_t **allocated_addrs = Amphora_HeapAlloc(render_list_node_count * sizeof(struct render_list_node_t *), MEM_MISC);
+	struct render_list_node_t **allocated_addrs = Amphora_HeapAlloc(inst->render_list_node_count * sizeof(struct render_list_node_t *), MEM_MISC);
 	Uint32 i = 0;
 
-	while (render_list)
+	while (inst->render_list)
 	{
-		allocated_addrs[i++] = render_list;
-		render_list = render_list->next;
+		allocated_addrs[i++] = inst->render_list;
+		inst->render_list = inst->render_list->next;
 	}
-	for (i = 0; i < render_list_node_count; i++)
+	for (i = 0; i < inst->render_list_node_count; i++)
 	{
 		if (allocated_addrs[i]->garbage)
 		{
@@ -390,31 +386,31 @@ Amphora_ResetRenderList(void)
 void
 Amphora_UpdateCamera(void)
 {
-	if (camera_mode == CAM_MANUAL) return;
+	if (inst->camera_mode == CAM_MANUAL) return;
 
-	camera = Amphora_GetSpriteCenterV1(camera_target);
-	camera.x -= (float)render_logical_size.x / 2.0f;
-	camera.y -= (float)render_logical_size.y / 2.0f;
-	if (!camera_boundary.w && !camera_boundary.h) return;
+	inst->camera = Amphora_GetSpriteCenterV1(inst->camera_target);
+	inst->camera.x -= (float)inst->render_logical_size.x / 2.0f;
+	inst->camera.y -= (float)inst->render_logical_size.y / 2.0f;
+	if (!inst->camera_boundary.w && !inst->camera_boundary.h) return;
 
-	if (camera.x < camera_boundary.x || camera.x + (float)render_logical_size.x > camera_boundary.x + camera_boundary.w)
+	if (inst->camera.x < inst->camera_boundary.x || inst->camera.x + (float)inst->render_logical_size.x > inst->camera_boundary.x + inst->camera_boundary.w)
 	{
-		camera.x = camera.x > camera_boundary.x ?
-			camera_boundary.x + camera_boundary.w - (float)render_logical_size.x :
-			camera_boundary.x;
+		inst->camera.x = inst->camera.x > inst->camera_boundary.x ?
+			inst->camera_boundary.x + inst->camera_boundary.w - (float)inst->render_logical_size.x :
+			inst->camera_boundary.x;
 	}
-	if (camera.y < camera_boundary.y || camera.y + (float)render_logical_size.y > camera_boundary.y + camera_boundary.h)
+	if (inst->camera.y < inst->camera_boundary.y || inst->camera.y + (float)inst->render_logical_size.y > inst->camera_boundary.y + inst->camera_boundary.h)
 	{
-		camera.y = camera.y > camera_boundary.y ?
-			camera_boundary.y + camera_boundary.h - (float)render_logical_size.y :
-			camera_boundary.y;
+		inst->camera.y = inst->camera.y > inst->camera_boundary.y ?
+			inst->camera_boundary.y + inst->camera_boundary.h - (float)inst->render_logical_size.y :
+			inst->camera_boundary.y;
 	}
 }
 
 void
 Amphora_RenderTexture(SDL_Texture *texture, const SDL_Rect *srcrect, const SDL_FRect *dstrect, double angle, SDL_RendererFlip flip)
 {
-	SDL_RenderCopyExF(renderer, texture, srcrect, dstrect, angle, NULL, flip);
+	SDL_RenderCopyExF(inst->renderer, texture, srcrect, dstrect, angle, NULL, flip);
 }
 
 /*
@@ -424,18 +420,18 @@ Amphora_RenderTexture(SDL_Texture *texture, const SDL_Rect *srcrect, const SDL_F
 int
 Amphora_InitRenderList(void)
 {
-	if ((render_list = Amphora_HeapAlloc(sizeof(struct render_list_node_t), MEM_RENDERABLE)) == NULL)
+	if ((init.render_list = Amphora_HeapAlloc(sizeof(struct render_list_node_t), MEM_RENDERABLE)) == NULL)
 	{
 		Amphora_SetError(AMPHORA_STATUS_ALLOC_FAIL, "Failed to initialize render list\n");
 
 		return AMPHORA_STATUS_ALLOC_FAIL;
 	}
-	render_list->type = AMPH_OBJ_NIL;
-	render_list->order = SDL_MIN_SINT32;
-	render_list->garbage = false;
-	render_list->next = NULL;
-	render_list_head = render_list;
-	render_list_node_count = 1;
+	init.render_list->type = AMPH_OBJ_NIL;
+	init.render_list->order = SDL_MIN_SINT32;
+	init.render_list->garbage = false;
+	init.render_list->next = NULL;
+	init.render_list_head = init.render_list;
+	init.render_list_node_count = 1;
 
 	return AMPHORA_STATUS_OK;
 }
@@ -447,5 +443,5 @@ Amphora_InitRenderList(void)
 void
 Amphora_RegisterWindowTitle(const char *title)
 {
-	window_title = title;
+	init.window_title = title;
 }

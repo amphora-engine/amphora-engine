@@ -1,3 +1,4 @@
+#include "internal/context.h"
 #include "internal/error.h"
 #include "internal/ht_hash.h"
 #include "internal/memory.h"
@@ -10,12 +11,8 @@
 /* Prototypes for private functions */
 static SDL_Texture *Amphora_RenderStringToTexture(AmphoraString *msg);
 
-/* File-scoped variables */
-static HT_HashTable fonts;
-static HT_HashTable open_fonts;
-static const char **font_names;
-static const char **font_paths;
-static int font_count;
+static struct ttf_ctx init;
+static struct ttf_ctx *inst = &init;
 
 AmphoraString *
 Amphora_CreateStringV1(const char *font_name, const int pt, const float x, const float y, const int order, const AmphoraColor color, const bool stationary, const bool transient, const char *fmt, va_list args)
@@ -26,18 +23,18 @@ Amphora_CreateStringV1(const char *font_name, const int pt, const float x, const
 	SDL_Color initial_color = { color.r, color.g, color.b, color.a };
 	char text[AMPHORA_MAX_STR_LEN];
 
-	if (HT_GetValue(font_name, fonts) == -1)
+	if (HT_GetValue(font_name, inst->fonts) == -1)
 	{
 		SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Unable to locate font %s\n", font_name);
 		return NULL;
 	}
-	if (HT_GetValue(font_name, open_fonts) == -1)
+	if (HT_GetValue(font_name, inst->open_fonts) == -1)
 	{
 #ifdef DEBUG
 		SDL_Log("Loading font: %s\n", font_name);
 #endif
-		font_rw = SDL_RWFromFile(HT_GetRef(font_name, char, fonts), "rb");
-		HT_StoreRef(font_name, TTF_OpenFontRW(font_rw, 1, 16), open_fonts);
+		font_rw = SDL_RWFromFile(HT_GetRef(font_name, char, inst->fonts), "rb");
+		HT_StoreRef(font_name, TTF_OpenFontRW(font_rw, 1, 16), inst->open_fonts);
 	}
 	(void)SDL_vsnprintf(text, sizeof(text), fmt, args);
 
@@ -50,7 +47,7 @@ Amphora_CreateStringV1(const char *font_name, const int pt, const float x, const
 		return NULL;
 
 	msg->type = AMPH_OBJ_TXT;
-	msg->font_ptr = HT_GetRef(font_name, TTF_Font, open_fonts);
+	msg->font_ptr = HT_GetRef(font_name, TTF_Font, inst->open_fonts);
 	msg->pt = pt;
 	msg->len = SDL_strlen(text);
 	msg->n = 0;
@@ -212,13 +209,13 @@ Amphora_InitFonts(void)
 {
 	int i;
 
-	fonts = HT_NewTable();
-	open_fonts = HT_NewTable();
-	for (i = 0; i < font_count; i++)
+	init.fonts = HT_NewTable();
+	init.open_fonts = HT_NewTable();
+	for (i = 0; i < init.font_count; i++)
 	{
-		HT_StoreRef(font_names[i], font_paths[i], fonts);
+		HT_StoreRef(init.font_names[i], init.font_paths[i], init.fonts);
 #ifdef DEBUG
-		SDL_Log("Found font %s\n", font_names[i]);
+		SDL_Log("Found font %s\n", init.font_names[i]);
 #endif
 	}
 
@@ -230,16 +227,16 @@ Amphora_FreeAllFonts(void)
 {
 	int i;
 
-	for (i = 0; i < font_count; i++)
+	for (i = 0; i < inst->font_count; i++)
 	{
-		if (HT_GetValue(font_names[i], open_fonts) != -1)
+		if (HT_GetValue(inst->font_names[i], inst->open_fonts) != -1)
 		{
 #ifdef DEBUG
-            SDL_Log("Unloading font: %s\n", font_names[i]);
+            SDL_Log("Unloading font: %s\n", inst->font_names[i]);
 #endif
-			TTF_CloseFont(HT_GetRef(font_names[i], TTF_Font, open_fonts));
-			(void)HT_SetValue(font_names[i], 0, open_fonts);
-			HT_DeleteKey(font_names[i], open_fonts);
+			TTF_CloseFont(HT_GetRef(inst->font_names[i], TTF_Font, inst->open_fonts));
+			(void)HT_SetValue(inst->font_names[i], 0, inst->open_fonts);
+			HT_DeleteKey(inst->font_names[i], inst->open_fonts);
 		}
 	}
 
@@ -249,8 +246,8 @@ void
 Amphora_CloseFonts(void)
 {
 	Amphora_FreeAllFonts();
-	HT_FreeTable(fonts);
-	HT_FreeTable(open_fonts);
+	HT_FreeTable(init.fonts);
+	HT_FreeTable(init.open_fonts);
 }
 
 /*
@@ -290,7 +287,7 @@ Amphora_RenderStringToTexture(AmphoraString *msg)
 void
 Amphora_RegisterFontData(const char **names, const char **paths, int count)
 {
-	font_names = names;
-	font_paths = paths;
-	font_count = count;
+	init.font_names = names;
+	init.font_paths = paths;
+	init.font_count = count;
 }
