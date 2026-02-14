@@ -16,6 +16,7 @@ void Amphora_DeInitSceneManager(void);
 void Amphora_InitScene(void);
 void Amphora_UpdateScene(void);
 void Amphora_DestroyScene(void);
+unsigned long Amphora_GetGeneration(void);
 bool Amphora_IsSceneUpdateLocked(void);
 void Amphora_LockSceneUpdate(void);
 void Amphora_UnlockSceneUpdate(void);

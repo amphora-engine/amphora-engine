@@ -153,6 +153,7 @@ struct scenes_ctx
 	SDL_Color fade_color;
 	SDL_Rect fade_rect;
 	bool scene_update_lock;
+	unsigned long generation;
 };
 
 struct session_data_ctx

@@ -15,7 +15,10 @@
 /* Prototypes for private functions */
 static void Amphora_SceneTransitionEvent(void);
 
-static struct scenes_ctx init = { .fade_color = { 0, 0, 0, 0xff } };
+static struct scenes_ctx init = {
+	.fade_color = { 0, 0, 0, 0xff },
+	.generation = 0
+};
 static struct scenes_ctx *inst = &init;
 
 int
@@ -54,6 +57,7 @@ Amphora_LoadSceneV1(const char *name)
 	}
 	inst->transition_fader.idx = 0;
 	inst->transition_fader.idx_mod = 1;
+	inst->generation++; /* unsigned long should realistically never overflow, but this would also not be catastrophic */
 
 	return AMPHORA_STATUS_OK;
 }
@@ -115,6 +119,12 @@ Amphora_DestroyScene(void)
 	Amphora_UnboundCameraV1();
 	Amphora_FreeAllIMG();
 	Amphora_FreeAllFonts();
+}
+
+unsigned long
+Amphora_GetGeneration(void)
+{
+	return inst->generation;
 }
 
 bool
